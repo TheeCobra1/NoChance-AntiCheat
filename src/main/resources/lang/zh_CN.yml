@@ -1,0 +1,522 @@
+prefix: "&c&lNC &8» "
+
+common:
+  no_permission: "&c&lNoChance &8» &7你没有权限使用该指令。"
+  console_only_player: "&c&lNoChance &8» &7该指令只能由玩家执行。"
+  player_only: "&c&lNoChance &8» &7该指令只能由玩家使用。"
+  player_not_found: "&c&lNoChance &8» &7未找到玩家。"
+  no_data: "&c&lNoChance &8» &7没有该玩家的数据。"
+  divider: "&8&m                                              "
+
+alert:
+  click_teleport: "&e点击传送"
+  click_freeze: "&e点击冻结"
+  click_spectate: "&e点击旁观"
+  ping: "&7延迟: &f{ping}ms"
+  fingerprint_direct: "&7客户端指纹匹配\n&8(行为分析；非确定标识)"
+  fingerprint_session: "&7指纹本会话稍早匹配到 &b{client}\n&8(过去5分钟，行为分析)"
+
+command:
+  reload_success: "&c&lNoChance &8» &7配置已成功重载。"
+  unknown: "&c&lNoChance &8» &7未知子命令。请尝试 &c/nc help&7。"
+  help_header: "&c&lNoChance &8» &7反作弊命令"
+  alerts_enabled: "&c&lNoChance &8» &a警报已开启。"
+  alerts_disabled: "&c&lNoChance &8» &c警报已关闭。"
+  usage_info: "&c&lNoChance &8» &7用法: /nochance info <玩家>"
+  usage_violations: "&c&lNoChance &8» &7用法: /nochance violations <玩家>"
+  usage_reset: "&c&lNoChance &8» &7用法: /nochance reset <玩家>"
+  usage_toggle: "&c&lNoChance &8» &7用法: /nochance toggle <check>"
+  usage_profile: "&c&lNoChance &8» &7用法: /nochance profile <玩家>"
+  usage_variant: "&c&lNoChance &8» &7用法: /nochance variant <check>"
+  usage_spectate: "&c&lNoChance &8» &7用法: /nc spectate <玩家|stop|follow>"
+  usage_replay_play: "&c&lNoChance &8» &7用法: /nc replay play <文件名>"
+  usage_replay_speed: "&c&lNoChance &8» &7用法: /nc replay speed <0.25-4>"
+  help:
+    menu: "&c/nc menu &8- &7打开 GUI 菜单"
+    reload: "&c/nc reload &8- &7重载配置"
+    info: "&c/nc info <玩家> &8- &7玩家信息"
+    violations: "&c/nc violations <玩家> &8- &7查看违规"
+    reset: "&c/nc reset <玩家> &8- &7重置违规"
+    toggle: "&c/nc toggle <check> &8- &7切换检测"
+    stats: "&c/nc stats &8- &7查看统计"
+    alerts: "&c/nc alerts &8- &7切换警报"
+    replay: "&c/nc replay <list|play|stop> &8- &7回放系统"
+    spectate: "&c/nc spectate <玩家|stop|follow> &8- &7旁观玩家"
+    freeze: "&c/nc freeze <玩家> &8- &7冻结/解冻玩家"
+    verbose: "&c/nc verbose &8- &7切换详细模式"
+    profile: "&c/nc profile <玩家> &8- &7查看玩家档案"
+    status: "&c/nc status &8- &7系统状态"
+    variant: "&c/nc variant <check> &8- &7A/B/C 分析"
+    web: "&c/nc web &8- &7与网页面板绑定"
+  info:
+    header: "&c&lNoChance &8» &7玩家信息: &f{player}"
+    skill: "&7技能等级: &c{value}"
+    cps: "&7平均 CPS: &c{value}"
+    rotation: "&7平均旋转速度: &c{value}"
+    accuracy: "&7命中精度: &c{value}"
+    score: "&7违规分数: &c{value}"
+    confidence: "&7置信等级: &c{value}"
+    active_punishment: "&7活动处罚: &c{type} &8(&7{duration}&8)"
+    duration_permanent: "永久"
+    violation_line: "&7{type}: &c{count}"
+  violations:
+    header: "&c&lNoChance &8» &7&f{player} &7的违规"
+    none: "&7最近无内存中违规。"
+    db_offline: "&c&lNoChance &8» &7玩家离线且数据库已禁用。"
+    lookup_offline: "&c&lNoChance &8» &7正在离线查询 &f{player}&7..."
+    no_history: "&c&lNoChance &8» &7&f{player} &7无历史记录。"
+    history_header: "&c&lNoChance &8» &7&f{player} &7的历史记录"
+    summary_line: "&c{type}: &7{count} 次违规 &8(平均严重度: &7{severity}&8)"
+    db_count_line: "&7数据库历史 ({count} 条):"
+    db_summary_line: "&c{type}: &7{count} &8(平均严重度: &7{severity}&8)"
+    recent_header: "&8&7最近:"
+    recent_line: "&8- &c{type} &7严重度: &f{severity} &8({ago} 前)"
+    more: "&8... 还有 {count} 条"
+  reset_done: "&c&lNoChance &8» &7已重置 &f{player} &7的违规"
+  toggle_result: "&c&lNoChance &8» &7检测 &f{check} &7现在为 {state}&7。"
+  toggle_state_on: "&a启用"
+  toggle_state_off: "&c禁用"
+  stats:
+    header: "&c&lNoChance &8» &7统计"
+    total: "&7监控玩家总数: &c{value}"
+    flagged: "&7有违规的玩家: &c{value}"
+    recent: "&7最近违规总数: &c{value}"
+  alerts_toggled: "&c&lNoChance &8» &7工作人员警报现在为 {state}&7。"
+  replay:
+    disabled: "&c&lNoChance &8» &7回放系统已禁用。"
+    help_header: "&c&lNoChance &8» &7回放命令:"
+    help_list: "&c/nc replay list [玩家] &8- &7列出回放"
+    help_play: "&c/nc replay play <文件> &8- &7观看回放"
+    help_stop: "&c/nc replay stop &8- &7停止"
+    help_pause: "&c/nc replay pause &8- &7暂停/继续"
+    help_speed: "&c/nc replay speed <x> &8- &7播放速度"
+    help_follow: "&c/nc replay follow &8- &7切换摄像机跟随"
+    help_hud: "&c/nc replay hud &8- &7切换 HUD"
+    dir: "&7回放目录: &f{path}"
+    none: "&c&lNoChance &8» &7没有回放。"
+    list_header: "&c&lNoChance &8» &7可用回放:"
+    list_line: "&8- &f{file}"
+    bad_speed: "&c&lNoChance &8» &7速度值无效。"
+    unknown: "&c&lNoChance &8» &7未知回放命令。"
+  spectate:
+    no_tools: "&c&lNoChance &8» &7工作人员工具未初始化。"
+  freeze:
+    no_tools: "&c&lNoChance &8» &7工作人员工具未初始化。"
+    none_frozen: "&c&lNoChance &8» &7当前没有冻结的玩家。"
+    list_header: "&c&lNoChance &8» &7已冻结玩家 ({count}):"
+    list_line: "&8- &f{name}"
+  verbose:
+    no_tools: "&c&lNoChance &8» &7工作人员工具未初始化。"
+    was_on: "&c&lNoChance &8» &7详细模式原为 &a启用&7，现已关闭。"
+  profile:
+    header: "&c&lNoChance &8» &7档案: &f{player}"
+    client: "&7客户端: {value}"
+    client_bedrock: "&d基岩版"
+    client_java: "&aJava 版"
+    ping: "&7延迟: &f{ping}ms &8(平均: &7{avg}ms&8)"
+    status: "&7状态: {value}"
+    status_frozen: "&c&l已冻结"
+    status_normal: "&a正常"
+    skill: "&7技能: &f{value}"
+    cps: "&7CPS: &f{value}"
+    rotation: "&7旋转: &f{value}"
+    accuracy: "&7精度: &f{value}"
+    vl_ratio: "&7违规比率: &f{value}"
+    high_ping: "&7高延迟: {value}"
+    yes_lbl: "&c是"
+    no_lbl: "&a否"
+    ping_mult: "&7延迟倍率: &f{value}"
+    no_data: "&c&lNoChance &8» &7没有该玩家的数据。"
+  status:
+    header: "&c&lNoChance &8» &7系统状态"
+    version: "&7版本: &f{value}"
+    tracked: "&7追踪玩家: &f{value}"
+    checks_loaded: "&7已加载检测: &f{value}"
+    alert_mgr: "&7警报管理: {value}"
+    staff_tools: "&7工作人员工具: {value}"
+    prediction: "&7移动预测: {value}"
+    simulation: "&7模拟: {value}"
+    sim_bridge: "&7模拟桥: {value}"
+    session: "&7会话追踪: {value}"
+    protocol: "&7协议分析: {value}"
+    overlay: "&7实时悬浮: {value}"
+    replay: "&7回放系统: {value}"
+    database: "&7数据库: {value}"
+    active: "&a活跃"
+    off_lbl: "&c关闭"
+    enabled: "&a启用"
+    disabled: "&c禁用"
+    connected: "&a已连接"
+  variant:
+    no_engine: "&c&lNoChance &8» &7检测引擎不可用。"
+    unknown: "&c&lNoChance &8» &7未知检测: {check}"
+    header: "&c&lNoChance &8» &7变体分析: &f{check}"
+    best: "&7最佳变体: &f{variant} &8(改进: &f{improvement}{significance}&8)"
+    significant: " &a*显著*"
+    not_significant: " &7不显著"
+    row: "&7变体 &f{variant}&7: 样本=&f{samples} &7精度=&f{accuracy} &7fp=&f{fp} &7tp=&f{tp}"
+  web:
+    not_init: "&c&lNoChance &8» &7网页面板未初始化。"
+    status_header: "&c&lNoChance &8» &7网页面板状态"
+    state_linked: "&7状态: &a已绑定"
+    state_pending: "&7状态: &e等待管理员认领代码"
+    state_unlinked: "&7状态: &c未绑定"
+    server_id: "&7服务器 ID: &f{id}"
+    pending_code: "&7待处理: &f{code}"
+    run_hint: "&7运行 &f/nc web &7开始绑定。"
+    not_linked: "&c&lNoChance &8» &7服务器当前未绑定。"
+    unlinked: "&c&lNoChance &8» &a服务器已从面板解绑。"
+    cancelled: "&c&lNoChance &8» &7绑定请求已取消。"
+    op_only: "&c&lNoChance &8» &7绑定必须由游戏中的 OP 执行。"
+    op_required: "&c&lNoChance &8» &7只有服务器运营者可以绑定面板。"
+    already_linked: "&c&lNoChance &8» &7已绑定。请先使用 &f/nc web unlink&7。"
+    disabled: "&c&lNoChance &8» &7配置中已禁用网页面板。"
+    pair_header: "&c&lNoChance &8» &7网页绑定"
+    pair_code: "&7你的代码: &f&l{code}"
+    pair_enter: "&7在面板中输入此代码:"
+    pair_url: "&b{url}/mcserver/link"
+    pair_expiry: "&8 5 分钟后过期。一次性使用。"
+
+gui:
+  title:
+    main: "&c&lNoChance &8» &7主菜单"
+    movement: "&c&l移动检测"
+    block: "&c&l方块交互检测"
+    combat: "&c&l战斗检测"
+    other: "&c&l其他检测"
+    thresholds: "&c&l阈值设置"
+    statistical: "&c&l统计设置"
+    skill_profiles: "&c&l技能配置"
+    general: "&c&l通用设置"
+    killaura: "&e&lKillAura 设置"
+    fastbreak: "&e&lFastBreak 设置"
+    check_config: "&c&l配置 &f{name}"
+    skill_config: "&c&l配置 &f{name} 技能"
+  common:
+    back: "&c&l返回"
+    save: "&c&l保存更改"
+    save_lore: "&7点击保存到 config.yml"
+    current: "&7当前: &f{value}"
+    current_pct: "&7当前: &f{value}"
+    percentage: "&7百分比: &f{value}"
+    click_dec: "&7&l左键 &8- &7减少 {amount}"
+    click_inc: "&7&l右键 &8- &7增加 {amount}"
+    click_configure: "&e&l点击配置"
+  lore:
+    back_main: "&7返回主菜单"
+    back_checks: "&7返回检测菜单"
+    back_combat: "&7返回战斗检测"
+    back_block: "&7返回方块检测"
+    back_profiles: "&7返回技能配置"
+  label:
+    low: "低"
+    medium: "中"
+    high: "高"
+    std_dev: "标准差"
+    outlier: "异常容忍"
+    time_window: "时间窗口"
+    grace: "宽限期"
+    min_samples: "最少样本"
+    min_cps: "最小 CPS"
+    max_cps: "最大 CPS"
+    min_rot: "最小旋转"
+    max_rot: "最大旋转"
+    min_acc: "最小准确度"
+    max_acc: "最大准确度"
+    cps_trust: "CPS 信任加成"
+    max_angle: "最大角度"
+    angle_trust: "角度信任加成"
+    req_vl: "所需违规数"
+    pkt_var: "数据包方差"
+    pkt_rate: "数据包速率"
+    base_tol: "基础容差"
+    pct_tol: "百分比容差"
+    shovel_tol: "铲子容差"
+    shovel_pct: "铲子百分比"
+    hand_tol: "徒手容差"
+    trust_inst: "信任加成 (瞬挖)"
+    trust_norm: "信任加成 (普通)"
+  menu:
+    main:
+      movement:
+        name: "&c&l移动检测"
+        lore:
+          "0": "&7点击管理移动检测"
+          "1": "&8• &7Fly, Speed, NoClip, Jesus, Blink"
+          "2": "&8• &7ElytraFly, NoSlow"
+      block:
+        name: "&c&l方块交互检测"
+        lore:
+          "0": "&7点击管理方块检测"
+          "1": "&8• &7FastBreak, FastPlace, Nuker, Scaffold"
+      combat:
+        name: "&c&l战斗检测"
+        lore:
+          "0": "&7点击管理战斗检测"
+          "1": "&8• &7KillAura, AutoClicker, Reach, Inventory"
+      other:
+        name: "&c&l其他检测"
+        lore:
+          "0": "&7点击管理其他检测"
+          "1": "&8• &7NoFall, Timer, Velocity, Criticals"
+          "2": "&8• &7Phase, Step, GroundSpoof"
+          "3": "&8• &7BoatFly, Strider"
+      thresholds:
+        name: "&c&l阈值设置"
+        lore:
+          "0": "&7调整置信度阈值"
+          "1": "&8• &7低、中、高置信度"
+      statistical:
+        name: "&c&l统计设置"
+        lore:
+          "0": "&7配置统计分析"
+          "1": "&8• &7偏差、异常容忍"
+      skill_profiles:
+        name: "&c&l技能配置"
+        lore:
+          "0": "&7按技能等级检测"
+          "1": "&8• &7低、中、高技能"
+      general:
+        name: "&c&l通用设置"
+        lore:
+          "0": "&7通用配置选项"
+          "1": "&8• &7时间窗口、宽限期"
+      close:
+        name: "&c&l关闭菜单"
+        lore:
+          "0": "&7点击关闭"
+    block:
+      fastbreak_settings:
+        name: "&e&lFastBreak 设置"
+        lore:
+          "0": "&7调整 FastBreak 检测"
+          "1": "&8• &7容差与加成"
+          "2": "&8• &7工具相关设置"
+    combat:
+      killaura_settings:
+        name: "&e&lKillAura 设置"
+        lore:
+          "0": "&7调整 KillAura 检测"
+          "1": "&8• &7CPS、角度、旋转限制"
+          "2": "&8• &7信任加成与惩罚"
+    check:
+      enabled: "&a&l已启用"
+      disabled: "&c&l已禁用"
+      toggle_lore:
+        "0": "&7点击切换"
+      status: "&7状态: {value}"
+      status_on: "&a已启用"
+      status_off: "&c已禁用"
+      threshold: "&7阈值: &f{value}"
+      severity: "&7严重度: &f{value}"
+      complexity: "&7复杂度: &f{value}"
+      vl_threshold: "&c&l违规阈值"
+      sev_mult: "&6&l严重度倍数"
+    thresholds:
+      low:
+        name: "&e&l低置信度"
+      medium:
+        name: "&6&l中置信度"
+      high:
+        name: "&c&l高置信度"
+    stat:
+      std_dev:
+        name: "&b&l标准差倍数"
+      outlier:
+        name: "&d&l异常容忍"
+    skill_profiles:
+      low:
+        name: "&e&l低技能配置"
+      medium:
+        name: "&6&l中技能配置"
+      high:
+        name: "&c&l高技能配置"
+      entry:
+        min_cps: "&7最小 CPS: &f{value}"
+        max_cps: "&7最大 CPS: &f{value}"
+        min_rot: "&7最小旋转: &f{value}°/s"
+        max_rot: "&7最大旋转: &f{value}°/s"
+        min_acc: "&7最小准确度: &f{value}%"
+        max_acc: "&7最大准确度: &f{value}%"
+      info:
+        name: "&b&l信息"
+        lore:
+          "0": "&7技能配置会根据玩家数据"
+          "1": "&7自动为每位玩家校准。"
+          "2": ""
+          "3": "&7这些范围定义各等级"
+          "4": "&7的正常值。"
+    skill:
+      min_cps: "&a&l最小 CPS"
+      max_cps: "&c&l最大 CPS"
+      min_rot: "&a&l最小旋转速度"
+      max_rot: "&c&l最大旋转速度"
+      min_acc: "&a&l最小准确度"
+      max_acc: "&c&l最大准确度"
+    general:
+      time_window:
+        name: "&e&l时间窗口"
+        desc:
+          "0": "&7追踪违规和"
+          "1": "&7计算分数的时长。"
+      grace:
+        name: "&b&l宽限期"
+        desc:
+          "0": "&7玩家加入后，检测开始"
+          "1": "&7监控之前的时间。"
+      min_samples:
+        name: "&d&l最少样本"
+        desc:
+          "0": "&7标记违规之前所需的"
+          "1": "&7最少数据点。"
+    killaura:
+      max_cps:
+        name: "&c&l最大 CPS"
+        desc: "&7最大每秒点击数"
+      cps_trust:
+        name: "&a&lCPS 信任加成"
+        desc: "&7受信任玩家的额外 CPS"
+      max_angle:
+        name: "&c&l最大角度"
+        desc: "&7触发标记的最大命中角度"
+      angle_trust:
+        name: "&a&l角度信任加成"
+        desc: "&7受信任玩家的额外角度"
+      max_rot:
+        name: "&c&l最大旋转"
+        desc: "&7触发标记的最大旋转速度"
+      req_vl:
+        name: "&e&l所需违规数"
+        desc: "&7标记前需要的违规数"
+      pkt_var:
+        name: "&d&l数据包方差"
+        desc: "&7数据包时序一致性限制"
+      pkt_rate:
+        name: "&d&l数据包速率"
+        desc: "&7每秒最大数据包攻击数"
+    fastbreak:
+      base_tol:
+        name: "&c&l基础容差"
+        desc: "&7基础时间容差 (毫秒)"
+      pct_tol:
+        name: "&c&l百分比容差"
+        desc: "&7期望时间的百分比"
+      shovel_tol:
+        name: "&e&l铲子容差"
+        desc: "&7瞬挖铲子容差"
+      shovel_pct:
+        name: "&e&l铲子百分比"
+        desc: "&7铲子百分比容差"
+      hand_tol:
+        name: "&b&l徒手容差"
+        desc: "&7徒手挖掘容差"
+      trust_inst:
+        name: "&a&l信任加成 (瞬挖)"
+        desc: "&7瞬挖的信任加成"
+      trust_norm:
+        name: "&a&l信任加成 (普通)"
+        desc: "&7普通挖掘的信任加成"
+  feedback:
+    toggled_on: "&c&lNoChance &8» &7已将 {check} 切换为 &a启用"
+    toggled_off: "&c&lNoChance &8» &7已将 {check} 切换为 &c禁用"
+    threshold_set: "&c&lNoChance &8» &7阈值已设为 &f{value}"
+    severity_set: "&c&lNoChance &8» &7严重度已设为 &f{value}"
+    saved: "&c&lNoChance &8» &a&l已保存 &7所有更改至 config.yml"
+    err_low_lt_med: "&c&lNoChance &8» &c低阈值必须小于中阈值！"
+    err_med_between: "&c&lNoChance &8» &c中阈值必须介于低与高之间！"
+    err_high_gt_med: "&c&lNoChance &8» &c高阈值必须大于中阈值！"
+    err_min_cps: "&c&lNoChance &8» &c最小 CPS 必须小于最大 CPS！"
+    err_max_cps: "&c&lNoChance &8» &c最大 CPS 必须大于最小 CPS！"
+    err_min_rot: "&c&lNoChance &8» &c最小旋转必须小于最大旋转！"
+    err_max_rot: "&c&lNoChance &8» &c最大旋转必须大于最小旋转！"
+    err_min_acc: "&c&lNoChance &8» &c最小准确度必须小于最大准确度！"
+    err_max_acc: "&c&lNoChance &8» &c最大准确度必须大于最小准确度！"
+    value_set: "&c&lNoChance &8» &7{label}: &f{value}"
+
+staff:
+  freeze:
+    bypass: "&c&lNoChance &8» &7无法冻结该玩家 (拥有 bypass 权限)。"
+    unfrozen_staff: "&c&lNoChance &8» &f{player} &7已被 &a解冻&7 (冻结了 &f{seconds}s&7)。"
+    unfrozen_target: "&c&lNoChance &8» &7你已被工作人员解冻。"
+    frozen_staff: "&c&lNoChance &8» &f{player} &7已被 &c冻结&7。"
+    frozen_target: "&c&lNoChance &8» &7你已被工作人员冻结。"
+    frozen_warn: "&c&lNoChance &8» &7请勿退出，否则会被封禁。"
+    title_main: "&c&l已冻结"
+    title_sub: "&7请勿断开连接"
+    actionbar: "&c&l你已被冻结 &8| &7请勿断开连接"
+  spectate:
+    self: "&c&lNoChance &8» &7无法旁观自己。"
+    started: "&c&lNoChance &8» &7正在旁观 &f{player}&7。"
+    hint: "&7使用 &f/nc spectate stop &7退出，&f/nc spectate follow &7切换跟随。"
+    stopped: "&c&lNoChance &8» &7已停止旁观。"
+    not_spectating: "&c&lNoChance &8» &7你没有在旁观任何人。"
+    follow_toggled: "&c&lNoChance &8» &7摄像机跟随 {state}&7。"
+    on_lbl: "&a启用"
+    off_lbl: "&c禁用"
+    actionbar: "&7旁观 &f{player} &8| &7延迟: &f{ping}ms &8| &7CPS: &f{cps}"
+  verbose:
+    off_lbl: "&c&lNoChance &8» &7详细模式 &c已禁用&7。"
+    on_lbl: "&c&lNoChance &8» &7详细模式 &a已启用&7。你将看到所有检测触发。"
+
+punishment:
+  kick_extreme: "&c置信度极高的违规行为"
+  kick_high: "&c高置信度检测"
+  ban_extreme: "&c检测到极高置信度的作弊行为"
+  tempban_extreme: "&c高严重性违规"
+  tempban_high: "&c多次高置信度违规"
+  warn_high: "&c高置信度检测"
+  warn_medium: "&c多次可疑行为"
+  kick_medium: "&c过多中置信度违规"
+  kick_low: "&c过多低置信度违规"
+  kick_repeated: "&c同类违规反复出现"
+  warning: "&e[NoChance] &7您因可疑行为被标记。请公平游戏。"
+  warn_title: "&c&l[!] &c反作弊警告"
+  warn_flagged: "&7你因此被标记: &e{type}"
+  warn_stop: "&7停止可疑行为否则将被处罚。"
+  broadcast_warn: "&6[NoChance] &e{player} &7因 &e{type} &7被 &e警告"
+  broadcast_kick: "&6[NoChance] &e{player} &7因 &e{type} &7被 &c踢出"
+  broadcast_tempban: "&6[NoChance] &e{player} &7因 &e{type} &7被 &c临时封禁 &7({duration})"
+  broadcast_ban: "&6[NoChance] &e{player} &7因 &e{type} &7被 &4&l永久封禁"
+  kick_format: "&c[NoChance] {reason}\n&7类型: {type}\n&7置信: {confidence}"
+  kick_tempban_suffix: "\n\n&7封禁时长: &e{duration}"
+  kick_ban_suffix: "\n\n&c&l永久封禁"
+
+listener:
+  bedrock_exempt: "&c&lNoChance &8» &d[基岩版] &7{player} 加入 (检测放宽)"
+  strict_detection: "&c&lNoChance &8» &7对 &e{player} &7启用严格检测 - 于 &f{seconds}s &7前被踢 (历史: &f{count} &7次违规)"
+  update_available: "&c&lNoChance &8» &7有可用更新!"
+  update_versions: "&c&lNoChance &8» &7当前: &f{current} &8| &7最新: &f{latest}"
+  update_download: "&c&lNoChance &8» &7下载: &fhttps://www.spigotmc.org/resources/129357/"
+  frozen_disconnect: "&c&lNoChance &8» &c&l警告: &f{player} &7在冻结状态下断线!"
+  profile_shift: "&c&lNoChance &8» &6[Toggle] &f{player} &7{metric} 偏移: &f{baseline} &7-> &c{current} &8(sev: {severity})"
+
+replay:
+  task:
+    no_data: "&c&lNoChance &8» &7回放没有数据。"
+    header: "&c&lNoChance &8» &7回放: &f{player} &8| &c{type}"
+    duration: "&c&lNoChance &8» &7时长: &f{duration}s &8| &7置信: &f{confidence}"
+    controls: "&c&lNoChance &8» &7控制: &fstop&8, &fpause&8, &fspeed <x>&8, &ffollow&8, &fhud"
+    finished: "&c&lNoChance &8» &7回放结束。"
+    stopped: "&c&lNoChance &8» &7回放已停止。"
+    resumed: "&c&lNoChance &8» &7已恢复。"
+    paused: "&c&lNoChance &8» &7已暂停。"
+    speed_set: "&c&lNoChance &8» &7速度: &f{speed}x"
+    follow_set: "&c&lNoChance &8» &7跟随: {state}"
+    hud_set: "&c&lNoChance &8» &7HUD: {state}"
+    state_on: "&aON"
+    state_off: "&cOFF"
+    stats_header: "&c&lNoChance &8» &7方块统计:"
+    stats_breaks: "&8  ├ &7破坏: &f{total} &8(&c{suspicious} 可疑&8)"
+    stats_places: "&8  ├ &7放置: &f{total}"
+    stats_avg: "&8  ├ &7平均: &f{ms}ms"
+    stats_fastest: "&8  └ &7最快: {color}{ms}ms &7({material})"
+  mgr:
+    already_watching: "&c&lNoChance &8» &7已在观看。请先使用 &f/nc replay stop&7。"
+    load_failed: "&c&lNoChance &8» &7加载失败: {error}"
+    ended: "&c&lNoChance &8» &7已结束 &f{player} &8(&7{type}&8) &7的回放"
+    not_watching: "&c&lNoChance &8» &7没有正在观看的回放。"
+
+web:
+  endpoint_unreachable: "&c&lNoChance &8» &c无法连接网页面板。请检查 config.yml 中的 endpoint 后重试 /nc web。"
+  linked: "&c&lNoChance &8» &a服务器已链接到 &f{admin}&a!"
+  linked_server_id: "&7Server ID: &f{id}"

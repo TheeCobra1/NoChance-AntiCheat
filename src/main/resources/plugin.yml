@@ -1,0 +1,120 @@
+name: NoChance
+version: '1.5.7'
+main: NC.noChance.NoChance
+api-version: '1.21'
+author: Cobra4
+description: Anti-cheat plugin with 4-layer validation cascade and packet detection
+load: POSTWORLD
+softdepend: [floodgate, Geyser-Spigot, ViaVersion, ProtocolSupport, ProtocolLib]
+
+commands:
+  nochance:
+    description: Main NoChance command
+    usage: /nochance <menu|reload|info|violations|reset|toggle|stats|alerts|review|export-ml>
+    aliases: [nc, anticheat, ac]
+    permission: nochance.admin
+
+permissions:
+  nochance.admin:
+    description: Access to all NoChance commands
+    default: op
+  nochance.alerts:
+    description: Receive staff alert notifications
+    default: op
+  nochance.bypass:
+    description: Bypass all anti-cheat checks
+    default: false
+  nochance.bypass.fly:
+    description: Bypass fly check
+    default: false
+  nochance.bypass.speed:
+    description: Bypass speed check
+    default: false
+  nochance.bypass.noclip:
+    description: Bypass noclip check
+    default: false
+  nochance.bypass.jesus:
+    description: Bypass jesus check
+    default: false
+  nochance.bypass.fastbreak:
+    description: Bypass fastbreak check
+    default: false
+  nochance.bypass.fastplace:
+    description: Bypass fastplace check
+    default: false
+  nochance.bypass.nuker:
+    description: Bypass nuker check
+    default: false
+  nochance.bypass.killaura:
+    description: Bypass killaura check
+    default: false
+  nochance.bypass.nofall:
+    description: Bypass nofall check
+    default: false
+  nochance.bypass.autoclicker:
+    description: Bypass autoclicker check
+    default: false
+  nochance.bypass.reach:
+    description: Bypass reach check
+    default: false
+  nochance.bypass.inventory:
+    description: Bypass inventory check
+    default: false
+  nochance.bypass.scaffold:
+    description: Bypass scaffold check
+    default: false
+  nochance.bypass.timer:
+    description: Bypass timer check
+    default: false
+  nochance.bypass.velocity:
+    description: Bypass velocity check
+    default: false
+  nochance.bypass.criticals:
+    description: Bypass criticals check
+    default: false
+  nochance.bypass.phase:
+    description: Bypass phase check
+    default: false
+  nochance.bypass.step:
+    description: Bypass step check
+    default: false
+  nochance.bypass.blink:
+    description: Bypass blink check
+    default: false
+  nochance.bypass.noslow:
+    description: Bypass noslow check
+    default: false
+
+  nochance.bypass.groundspoof:
+    description: Bypass groundspoof check
+    default: false
+  nochance.bypass.elytrafly:
+    description: Bypass elytrafly check
+    default: false
+  nochance.bypass.strider:
+    description: Bypass strider check
+    default: false
+  nochance.bypass.boatfly:
+    description: Bypass boatfly check
+    default: false
+  nochance.staff.spectate:
+    description: Use spectate command
+    default: op
+  nochance.staff.freeze:
+    description: Use freeze command
+    default: op
+  nochance.staff.verbose:
+    description: Use verbose mode
+    default: op
+  nochance.web:
+    description: Pair server with the web dashboard
+    default: op
+  nochance.diag:
+    description: View plugin diagnostics
+    default: op
+  nochance.review:
+    description: Review ML flagged events and label outcomes
+    default: op
+  nochance.admin.export:
+    description: Export ML training data to CSV
+    default: op

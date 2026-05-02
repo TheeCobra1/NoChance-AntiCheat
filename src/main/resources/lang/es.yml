@@ -1,0 +1,522 @@
+prefix: "&c&lNC &8» "
+
+common:
+  no_permission: "&c&lNoChance &8» &7No tienes permiso para usar este comando."
+  console_only_player: "&c&lNoChance &8» &7Este comando solo puede ser usado por un jugador."
+  player_only: "&c&lNoChance &8» &7Este comando solo puede ser usado por jugadores."
+  player_not_found: "&c&lNoChance &8» &7Jugador no encontrado."
+  no_data: "&c&lNoChance &8» &7Sin datos para este jugador."
+  divider: "&8&m                                              "
+
+alert:
+  click_teleport: "&eClic para teletransportar"
+  click_freeze: "&eClic para congelar"
+  click_spectate: "&eClic para espectar"
+  ping: "&7Ping: &f{ping}ms"
+  fingerprint_direct: "&7Coincidencia de huella de cliente\n&8(comportamiento; no es ID definitivo)"
+  fingerprint_session: "&7Huella coincidió con &b{client}&7 antes en esta sesión\n&8(últimos 5 min, comportamiento)"
+
+command:
+  reload_success: "&c&lNoChance &8» &7Configuración recargada correctamente."
+  unknown: "&c&lNoChance &8» &7Subcomando desconocido. Prueba &c/nc help&7."
+  help_header: "&c&lNoChance &8» &7Comandos de Anti-Cheat"
+  alerts_enabled: "&c&lNoChance &8» &aAlertas activadas."
+  alerts_disabled: "&c&lNoChance &8» &cAlertas desactivadas."
+  usage_info: "&c&lNoChance &8» &7Uso: /nochance info <jugador>"
+  usage_violations: "&c&lNoChance &8» &7Uso: /nochance violations <jugador>"
+  usage_reset: "&c&lNoChance &8» &7Uso: /nochance reset <jugador>"
+  usage_toggle: "&c&lNoChance &8» &7Uso: /nochance toggle <check>"
+  usage_profile: "&c&lNoChance &8» &7Uso: /nochance profile <jugador>"
+  usage_variant: "&c&lNoChance &8» &7Uso: /nochance variant <check>"
+  usage_spectate: "&c&lNoChance &8» &7Uso: /nc spectate <jugador|stop|follow>"
+  usage_replay_play: "&c&lNoChance &8» &7Uso: /nc replay play <archivo>"
+  usage_replay_speed: "&c&lNoChance &8» &7Uso: /nc replay speed <0.25-4>"
+  help:
+    menu: "&c/nc menu &8- &7Abrir menú GUI"
+    reload: "&c/nc reload &8- &7Recargar config"
+    info: "&c/nc info <jugador> &8- &7Info del jugador"
+    violations: "&c/nc violations <jugador> &8- &7Ver violaciones"
+    reset: "&c/nc reset <jugador> &8- &7Reiniciar violaciones"
+    toggle: "&c/nc toggle <check> &8- &7Alternar check"
+    stats: "&c/nc stats &8- &7Ver estadísticas"
+    alerts: "&c/nc alerts &8- &7Alternar alertas"
+    replay: "&c/nc replay <list|play|stop> &8- &7Sistema de replay"
+    spectate: "&c/nc spectate <jugador|stop|follow> &8- &7Espectar jugador"
+    freeze: "&c/nc freeze <jugador> &8- &7Congelar/descongelar jugador"
+    verbose: "&c/nc verbose &8- &7Alternar modo verbose"
+    profile: "&c/nc profile <jugador> &8- &7Ver perfil del jugador"
+    status: "&c/nc status &8- &7Estado del sistema"
+    variant: "&c/nc variant <check> &8- &7Análisis A/B/C"
+    web: "&c/nc web &8- &7Vincular con el panel web"
+  info:
+    header: "&c&lNoChance &8» &7Info del jugador: &f{player}"
+    skill: "&7Nivel de habilidad: &c{value}"
+    cps: "&7CPS promedio: &c{value}"
+    rotation: "&7Rotación promedio: &c{value}"
+    accuracy: "&7Precisión: &c{value}"
+    score: "&7Puntaje de violación: &c{value}"
+    confidence: "&7Nivel de confianza: &c{value}"
+    active_punishment: "&7Castigo activo: &c{type} &8(&7{duration}&8)"
+    duration_permanent: "Permanente"
+    violation_line: "&7{type}: &c{count}"
+  violations:
+    header: "&c&lNoChance &8» &7Violaciones de &f{player}"
+    none: "&7Sin violaciones recientes en memoria."
+    db_offline: "&c&lNoChance &8» &7Jugador offline y base de datos deshabilitada."
+    lookup_offline: "&c&lNoChance &8» &7Búsqueda offline para &f{player}&7..."
+    no_history: "&c&lNoChance &8» &7Sin historial para &f{player}&7."
+    history_header: "&c&lNoChance &8» &7Historial de &f{player}"
+    summary_line: "&c{type}: &7{count} violaciones &8(Gravedad media: &7{severity}&8)"
+    db_count_line: "&7Historial BD ({count} entradas):"
+    db_summary_line: "&c{type}: &7{count} &8(sev. media: &7{severity}&8)"
+    recent_header: "&8&7Recientes:"
+    recent_line: "&8- &c{type} &7sev: &f{severity} &8(hace {ago})"
+    more: "&8... y {count} más"
+  reset_done: "&c&lNoChance &8» &7Violaciones reiniciadas para &f{player}"
+  toggle_result: "&c&lNoChance &8» &7Check &f{check} &7ahora está {state}&7."
+  toggle_state_on: "&aactivado"
+  toggle_state_off: "&cdesactivado"
+  stats:
+    header: "&c&lNoChance &8» &7Estadísticas"
+    total: "&7Jugadores monitoreados: &c{value}"
+    flagged: "&7Jugadores con violaciones: &c{value}"
+    recent: "&7Violaciones recientes: &c{value}"
+  alerts_toggled: "&c&lNoChance &8» &7Las alertas de staff ahora están {state}&7."
+  replay:
+    disabled: "&c&lNoChance &8» &7Sistema de replay deshabilitado."
+    help_header: "&c&lNoChance &8» &7Comandos de replay:"
+    help_list: "&c/nc replay list [jugador] &8- &7Listar replays"
+    help_play: "&c/nc replay play <archivo> &8- &7Ver replay"
+    help_stop: "&c/nc replay stop &8- &7Detener"
+    help_pause: "&c/nc replay pause &8- &7Pausar/reanudar"
+    help_speed: "&c/nc replay speed <x> &8- &7Velocidad"
+    help_follow: "&c/nc replay follow &8- &7Alternar seguir cámara"
+    help_hud: "&c/nc replay hud &8- &7Alternar HUD"
+    dir: "&7Carpeta replay: &f{path}"
+    none: "&c&lNoChance &8» &7Sin replays."
+    list_header: "&c&lNoChance &8» &7Replays disponibles:"
+    list_line: "&8- &f{file}"
+    bad_speed: "&c&lNoChance &8» &7Velocidad inválida."
+    unknown: "&c&lNoChance &8» &7Comando de replay desconocido."
+  spectate:
+    no_tools: "&c&lNoChance &8» &7Herramientas de staff no iniciadas."
+  freeze:
+    no_tools: "&c&lNoChance &8» &7Herramientas de staff no iniciadas."
+    none_frozen: "&c&lNoChance &8» &7Ningún jugador congelado."
+    list_header: "&c&lNoChance &8» &7Jugadores congelados ({count}):"
+    list_line: "&8- &f{name}"
+  verbose:
+    no_tools: "&c&lNoChance &8» &7Herramientas de staff no iniciadas."
+    was_on: "&c&lNoChance &8» &7Verbose estaba &aactivo&7, ahora desactivado."
+  profile:
+    header: "&c&lNoChance &8» &7Perfil: &f{player}"
+    client: "&7Cliente: {value}"
+    client_bedrock: "&dBedrock"
+    client_java: "&aJava"
+    ping: "&7Ping: &f{ping}ms &8(prom: &7{avg}ms&8)"
+    status: "&7Estado: {value}"
+    status_frozen: "&c&lCONGELADO"
+    status_normal: "&aNormal"
+    skill: "&7Habilidad: &f{value}"
+    cps: "&7CPS: &f{value}"
+    rotation: "&7Rotación: &f{value}"
+    accuracy: "&7Precisión: &f{value}"
+    vl_ratio: "&7Tasa de violaciones: &f{value}"
+    high_ping: "&7Ping alto: {value}"
+    yes_lbl: "&cSí"
+    no_lbl: "&aNo"
+    ping_mult: "&7Multiplicador de ping: &f{value}"
+    no_data: "&c&lNoChance &8» &7Sin datos para este jugador."
+  status:
+    header: "&c&lNoChance &8» &7Estado del sistema"
+    version: "&7Versión: &f{value}"
+    tracked: "&7Jugadores rastreados: &f{value}"
+    checks_loaded: "&7Checks cargados: &f{value}"
+    alert_mgr: "&7Alertas: {value}"
+    staff_tools: "&7Herramientas staff: {value}"
+    prediction: "&7Predicción de movimiento: {value}"
+    simulation: "&7Simulación: {value}"
+    sim_bridge: "&7Puente de simulación: {value}"
+    session: "&7Rastreador de sesión: {value}"
+    protocol: "&7Análisis de protocolo: {value}"
+    overlay: "&7Overlay en vivo: {value}"
+    replay: "&7Sistema de replay: {value}"
+    database: "&7Base de datos: {value}"
+    active: "&aActivo"
+    off_lbl: "&cApagado"
+    enabled: "&aActivado"
+    disabled: "&cDesactivado"
+    connected: "&aConectado"
+  variant:
+    no_engine: "&c&lNoChance &8» &7Motor de detección no disponible."
+    unknown: "&c&lNoChance &8» &7Check desconocido: {check}"
+    header: "&c&lNoChance &8» &7Análisis de variantes: &f{check}"
+    best: "&7Mejor variante: &f{variant} &8(mejora: &f{improvement}{significance}&8)"
+    significant: " &a*significativo*"
+    not_significant: " &7no significativo"
+    row: "&7Variante &f{variant}&7: muestras=&f{samples} &7prec=&f{accuracy} &7fp=&f{fp} &7tp=&f{tp}"
+  web:
+    not_init: "&c&lNoChance &8» &7Panel web no iniciado."
+    status_header: "&c&lNoChance &8» &7Estado del panel web"
+    state_linked: "&7Estado: &aVinculado"
+    state_pending: "&7Estado: &eEsperando que el admin reclame el código"
+    state_unlinked: "&7Estado: &cNo vinculado"
+    server_id: "&7ID del servidor: &f{id}"
+    pending_code: "&7Pendiente: &f{code}"
+    run_hint: "&7Ejecuta &f/nc web &7para iniciar."
+    not_linked: "&c&lNoChance &8» &7El servidor no está vinculado."
+    unlinked: "&c&lNoChance &8» &aServidor desvinculado del panel."
+    cancelled: "&c&lNoChance &8» &7Solicitud de vinculación cancelada."
+    op_only: "&c&lNoChance &8» &7La vinculación debe hacerse por un OP en el juego."
+    op_required: "&c&lNoChance &8» &7Solo operadores pueden vincular el panel."
+    already_linked: "&c&lNoChance &8» &7Ya vinculado. Usa &f/nc web unlink &7primero."
+    disabled: "&c&lNoChance &8» &7Panel web deshabilitado en la config."
+    pair_header: "&c&lNoChance &8» &7Vinculación web"
+    pair_code: "&7Tu código: &f&l{code}"
+    pair_enter: "&7Introduce este código en el panel:"
+    pair_url: "&b{url}/mcserver/link"
+    pair_expiry: "&8Expira en 5 minutos. Un solo uso."
+
+gui:
+  title:
+    main: "&c&lNoChance &8» &7Menú Principal"
+    movement: "&c&lChecks de Movimiento"
+    block: "&c&lChecks de Interacción con Bloques"
+    combat: "&c&lChecks de Combate"
+    other: "&c&lOtros Checks"
+    thresholds: "&c&lAjustes de Umbral"
+    statistical: "&c&lAjustes Estadísticos"
+    skill_profiles: "&c&lPerfiles de Habilidad"
+    general: "&c&lAjustes Generales"
+    killaura: "&e&lAjustes de KillAura"
+    fastbreak: "&e&lAjustes de FastBreak"
+    check_config: "&c&lConfigurar &f{name}"
+    skill_config: "&c&lConfigurar habilidad &f{name}"
+  common:
+    back: "&c&lAtrás"
+    save: "&c&lGuardar Cambios"
+    save_lore: "&7Clic para guardar en config.yml"
+    current: "&7Actual: &f{value}"
+    current_pct: "&7Actual: &f{value}"
+    percentage: "&7Porcentaje: &f{value}"
+    click_dec: "&7&lClic Izq &8- &7Bajar {amount}"
+    click_inc: "&7&lClic Der &8- &7Subir {amount}"
+    click_configure: "&e&lClic para configurar"
+  lore:
+    back_main: "&7Volver al menú principal"
+    back_checks: "&7Volver al menú de checks"
+    back_combat: "&7Volver a checks de combate"
+    back_block: "&7Volver a checks de bloques"
+    back_profiles: "&7Volver a perfiles"
+  label:
+    low: "Bajo"
+    medium: "Medio"
+    high: "Alto"
+    std_dev: "Desv Est"
+    outlier: "Perdón de atípicos"
+    time_window: "Ventana de Tiempo"
+    grace: "Periodo de Gracia"
+    min_samples: "Muestras Mín"
+    min_cps: "CPS Mín"
+    max_cps: "CPS Máx"
+    min_rot: "Rotación Mín"
+    max_rot: "Rotación Máx"
+    min_acc: "Precisión Mín"
+    max_acc: "Precisión Máx"
+    cps_trust: "Bono Confianza CPS"
+    max_angle: "Ángulo Máx"
+    angle_trust: "Bono Confianza Ángulo"
+    req_vl: "Violaciones Requeridas"
+    pkt_var: "Varianza de Paquetes"
+    pkt_rate: "Límite de Paquetes"
+    base_tol: "Tolerancia Base"
+    pct_tol: "Tolerancia Porcentual"
+    shovel_tol: "Tolerancia Pala"
+    shovel_pct: "Porcentaje Pala"
+    hand_tol: "Tolerancia Mano"
+    trust_inst: "Bono Confianza (Instantáneo)"
+    trust_norm: "Bono Confianza (Normal)"
+  menu:
+    main:
+      movement:
+        name: "&c&lChecks de Movimiento"
+        lore:
+          "0": "&7Clic para gestionar checks de movimiento"
+          "1": "&8• &7Fly, Speed, NoClip, Jesus, Blink"
+          "2": "&8• &7ElytraFly, NoSlow"
+      block:
+        name: "&c&lChecks de Interacción con Bloques"
+        lore:
+          "0": "&7Clic para gestionar checks de bloques"
+          "1": "&8• &7FastBreak, FastPlace, Nuker, Scaffold"
+      combat:
+        name: "&c&lChecks de Combate"
+        lore:
+          "0": "&7Clic para gestionar checks de combate"
+          "1": "&8• &7KillAura, AutoClicker, Reach, Inventory"
+      other:
+        name: "&c&lOtros Checks"
+        lore:
+          "0": "&7Clic para gestionar otros checks"
+          "1": "&8• &7NoFall, Timer, Velocity, Criticals"
+          "2": "&8• &7Phase, Step, GroundSpoof"
+          "3": "&8• &7BoatFly, Strider"
+      thresholds:
+        name: "&c&lAjustes de Umbral"
+        lore:
+          "0": "&7Ajusta umbrales de confianza"
+          "1": "&8• &7Confianza Baja, Media, Alta"
+      statistical:
+        name: "&c&lAjustes Estadísticos"
+        lore:
+          "0": "&7Configura análisis estadístico"
+          "1": "&8• &7Desviación, Perdón de atípicos"
+      skill_profiles:
+        name: "&c&lPerfiles de Habilidad"
+        lore:
+          "0": "&7Detección por nivel de habilidad"
+          "1": "&8• &7Baja, Media, Alta"
+      general:
+        name: "&c&lAjustes Generales"
+        lore:
+          "0": "&7Opciones generales"
+          "1": "&8• &7Ventana de tiempo, Gracia"
+      close:
+        name: "&c&lCerrar Menú"
+        lore:
+          "0": "&7Clic para cerrar"
+    block:
+      fastbreak_settings:
+        name: "&e&lAjustes de FastBreak"
+        lore:
+          "0": "&7Ajusta detección de FastBreak"
+          "1": "&8• &7Tolerancias y bonos"
+          "2": "&8• &7Ajustes por herramienta"
+    combat:
+      killaura_settings:
+        name: "&e&lAjustes de KillAura"
+        lore:
+          "0": "&7Ajusta detección de KillAura"
+          "1": "&8• &7Límites de CPS, Ángulo, Rotación"
+          "2": "&8• &7Bonos de confianza y penalizaciones"
+    check:
+      enabled: "&a&lActivado"
+      disabled: "&c&lDesactivado"
+      toggle_lore:
+        "0": "&7Clic para alternar"
+      status: "&7Estado: {value}"
+      status_on: "&aActivado"
+      status_off: "&cDesactivado"
+      threshold: "&7Umbral: &f{value}"
+      severity: "&7Gravedad: &f{value}"
+      complexity: "&7Complejidad: &f{value}"
+      vl_threshold: "&c&lUmbral de Violaciones"
+      sev_mult: "&6&lMultiplicador de Gravedad"
+    thresholds:
+      low:
+        name: "&e&lConfianza Baja"
+      medium:
+        name: "&6&lConfianza Media"
+      high:
+        name: "&c&lConfianza Alta"
+    stat:
+      std_dev:
+        name: "&b&lMultiplicador Desv Est"
+      outlier:
+        name: "&d&lPerdón de Atípicos"
+    skill_profiles:
+      low:
+        name: "&e&lPerfil Habilidad Baja"
+      medium:
+        name: "&6&lPerfil Habilidad Media"
+      high:
+        name: "&c&lPerfil Habilidad Alta"
+      entry:
+        min_cps: "&7CPS Mín: &f{value}"
+        max_cps: "&7CPS Máx: &f{value}"
+        min_rot: "&7Rotación Mín: &f{value}°/s"
+        max_rot: "&7Rotación Máx: &f{value}°/s"
+        min_acc: "&7Precisión Mín: &f{value}%"
+        max_acc: "&7Precisión Máx: &f{value}%"
+      info:
+        name: "&b&lInfo"
+        lore:
+          "0": "&7Los perfiles se calibran solos"
+          "1": "&7por jugador según sus estadísticas."
+          "2": ""
+          "3": "&7Estos rangos definen lo normal"
+          "4": "&7para cada nivel de habilidad."
+    skill:
+      min_cps: "&a&lCPS Mín"
+      max_cps: "&c&lCPS Máx"
+      min_rot: "&a&lVelocidad Rotación Mín"
+      max_rot: "&c&lVelocidad Rotación Máx"
+      min_acc: "&a&lPrecisión Mín"
+      max_acc: "&c&lPrecisión Máx"
+    general:
+      time_window:
+        name: "&e&lVentana de Tiempo"
+        desc:
+          "0": "&7Duración para rastrear violaciones"
+          "1": "&7y calcular puntuaciones."
+      grace:
+        name: "&b&lPeriodo de Gracia"
+        desc:
+          "0": "&7Tiempo tras unirse antes de que"
+          "1": "&7los checks empiecen a monitorear."
+      min_samples:
+        name: "&d&lMuestras Mín"
+        desc:
+          "0": "&7Puntos de datos mínimos antes"
+          "1": "&7de marcar violaciones."
+    killaura:
+      max_cps:
+        name: "&c&lCPS Máx"
+        desc: "&7Máx clics por segundo"
+      cps_trust:
+        name: "&a&lBono Confianza CPS"
+        desc: "&7CPS extra para jugadores de confianza"
+      max_angle:
+        name: "&c&lÁngulo Máx"
+        desc: "&7Ángulo máx de golpe antes del flag"
+      angle_trust:
+        name: "&a&lBono Confianza Ángulo"
+        desc: "&7Ángulo extra para jugadores de confianza"
+      max_rot:
+        name: "&c&lRotación Máx"
+        desc: "&7Velocidad máx de rotación"
+      req_vl:
+        name: "&e&lViolaciones Requeridas"
+        desc: "&7Violaciones necesarias para flag"
+      pkt_var:
+        name: "&d&lVarianza de Paquetes"
+        desc: "&7Límite de consistencia de timing"
+      pkt_rate:
+        name: "&d&lLímite de Paquetes"
+        desc: "&7Máx ataques por paquete por segundo"
+    fastbreak:
+      base_tol:
+        name: "&c&lTolerancia Base"
+        desc: "&7Tolerancia de tiempo base en ms"
+      pct_tol:
+        name: "&c&lTolerancia Porcentual"
+        desc: "&7Porcentaje del tiempo esperado"
+      shovel_tol:
+        name: "&e&lTolerancia Pala"
+        desc: "&7Tolerancia de minado instantáneo"
+      shovel_pct:
+        name: "&e&lPorcentaje Pala"
+        desc: "&7Tolerancia porcentual de pala"
+      hand_tol:
+        name: "&b&lTolerancia Mano"
+        desc: "&7Tolerancia al romper con mano"
+      trust_inst:
+        name: "&a&lBono Confianza (Instantáneo)"
+        desc: "&7Bono para minado instantáneo"
+      trust_norm:
+        name: "&a&lBono Confianza (Normal)"
+        desc: "&7Bono para roturas normales"
+  feedback:
+    toggled_on: "&c&lNoChance &8» &7Alternó {check} a &aactivado"
+    toggled_off: "&c&lNoChance &8» &7Alternó {check} a &cdesactivado"
+    threshold_set: "&c&lNoChance &8» &7Umbral establecido en &f{value}"
+    severity_set: "&c&lNoChance &8» &7Gravedad establecida en &f{value}"
+    saved: "&c&lNoChance &8» &a&lGuardado &7en config.yml"
+    err_low_lt_med: "&c&lNoChance &8» &c¡El umbral bajo debe ser menor que el medio!"
+    err_med_between: "&c&lNoChance &8» &c¡El medio debe estar entre bajo y alto!"
+    err_high_gt_med: "&c&lNoChance &8» &c¡El umbral alto debe ser mayor que el medio!"
+    err_min_cps: "&c&lNoChance &8» &c¡CPS mínimo debe ser menor que CPS máximo!"
+    err_max_cps: "&c&lNoChance &8» &c¡CPS máximo debe ser mayor que CPS mínimo!"
+    err_min_rot: "&c&lNoChance &8» &c¡Rotación mín debe ser menor que Rotación máx!"
+    err_max_rot: "&c&lNoChance &8» &c¡Rotación máx debe ser mayor que Rotación mín!"
+    err_min_acc: "&c&lNoChance &8» &c¡Precisión mín debe ser menor que Precisión máx!"
+    err_max_acc: "&c&lNoChance &8» &c¡Precisión máx debe ser mayor que Precisión mín!"
+    value_set: "&c&lNoChance &8» &7{label}: &f{value}"
+
+staff:
+  freeze:
+    bypass: "&c&lNoChance &8» &7No se puede congelar a este jugador (permiso bypass)."
+    unfrozen_staff: "&c&lNoChance &8» &f{player} &7ha sido &adescongelado&7 (estuvo congelado &f{seconds}s&7)."
+    unfrozen_target: "&c&lNoChance &8» &7Has sido descongelado por el staff."
+    frozen_staff: "&c&lNoChance &8» &f{player} &7ha sido &ccongelado&7."
+    frozen_target: "&c&lNoChance &8» &7Has sido congelado por el staff."
+    frozen_warn: "&c&lNoChance &8» &7No te desconectes o serás baneado."
+    title_main: "&c&lCONGELADO"
+    title_sub: "&7No te desconectes"
+    actionbar: "&c&lESTÁS CONGELADO &8| &7No te desconectes"
+  spectate:
+    self: "&c&lNoChance &8» &7No puedes espectarte a ti mismo."
+    started: "&c&lNoChance &8» &7Ahora espectando a &f{player}&7."
+    hint: "&7Usa &f/nc spectate stop &7para salir, &f/nc spectate follow &7para alternar seguir."
+    stopped: "&c&lNoChance &8» &7Dejaste de espectar."
+    not_spectating: "&c&lNoChance &8» &7No estás espectando a nadie."
+    follow_toggled: "&c&lNoChance &8» &7Cámara seguir {state}&7."
+    on_lbl: "&aactivado"
+    off_lbl: "&cdesactivado"
+    actionbar: "&7Espectando &f{player} &8| &7Ping: &f{ping}ms &8| &7CPS: &f{cps}"
+  verbose:
+    off_lbl: "&c&lNoChance &8» &7Modo verbose &cdesactivado&7."
+    on_lbl: "&c&lNoChance &8» &7Modo verbose &aactivado&7. Verás todos los triggers."
+
+punishment:
+  kick_extreme: "&cViolación de confianza extrema"
+  kick_high: "&cDetección de alta confianza"
+  ban_extreme: "&cTrampas detectadas con confianza extrema"
+  tempban_extreme: "&cViolaciones de alta gravedad"
+  tempban_high: "&cViolaciones repetidas de alta confianza"
+  warn_high: "&cDetección de alta confianza"
+  warn_medium: "&cMúltiples acciones sospechosas"
+  kick_medium: "&cViolaciones excesivas de confianza media"
+  kick_low: "&cViolaciones excesivas de confianza baja"
+  kick_repeated: "&cViolaciones repetidas del mismo tipo"
+  warning: "&e[NoChance] &7Has sido marcado por actividad sospechosa. Juega limpio."
+  warn_title: "&c&l[!] &cAVISO DE ANTI-CHEAT"
+  warn_flagged: "&7Has sido marcado por: &e{type}"
+  warn_stop: "&7Detén el comportamiento sospechoso o serás castigado."
+  broadcast_warn: "&6[NoChance] &e{player} &7fue &eadvertido &7por &e{type}"
+  broadcast_kick: "&6[NoChance] &e{player} &7fue &cexpulsado &7por &e{type}"
+  broadcast_tempban: "&6[NoChance] &e{player} &7fue &ctempbaneado &7({duration}) por &e{type}"
+  broadcast_ban: "&6[NoChance] &e{player} &7fue &4&lBANEADO PERMANENTE &7por &e{type}"
+  kick_format: "&c[NoChance] {reason}\n&7Tipo: {type}\n&7Confianza: {confidence}"
+  kick_tempban_suffix: "\n\n&7Baneado por: &e{duration}"
+  kick_ban_suffix: "\n\n&c&lBANEADO PERMANENTE"
+
+listener:
+  bedrock_exempt: "&c&lNoChance &8» &d[Bedrock] &7{player} se unió (checks relajados)"
+  strict_detection: "&c&lNoChance &8» &7Detección estricta para &e{player} &7- expulsado hace &f{seconds}s &7(historial: &f{count} &7violaciones)"
+  update_available: "&c&lNoChance &8» &7¡Actualización disponible!"
+  update_versions: "&c&lNoChance &8» &7Actual: &f{current} &8| &7Última: &f{latest}"
+  update_download: "&c&lNoChance &8» &7Descargar: &fhttps://www.spigotmc.org/resources/129357/"
+  frozen_disconnect: "&c&lNoChance &8» &c&lAVISO: &f{player} &7se desconectó mientras estaba congelado!"
+  profile_shift: "&c&lNoChance &8» &6[Toggle] &f{player} &7cambio de {metric}: &f{baseline} &7-> &c{current} &8(sev: {severity})"
+
+replay:
+  task:
+    no_data: "&c&lNoChance &8» &7La repetición no tiene datos."
+    header: "&c&lNoChance &8» &7Repetición: &f{player} &8| &c{type}"
+    duration: "&c&lNoChance &8» &7Duración: &f{duration}s &8| &7Confianza: &f{confidence}"
+    controls: "&c&lNoChance &8» &7Controles: &fstop&8, &fpause&8, &fspeed <x>&8, &ffollow&8, &fhud"
+    finished: "&c&lNoChance &8» &7Repetición terminada."
+    stopped: "&c&lNoChance &8» &7Repetición detenida."
+    resumed: "&c&lNoChance &8» &7Reanudado."
+    paused: "&c&lNoChance &8» &7Pausado."
+    speed_set: "&c&lNoChance &8» &7Velocidad: &f{speed}x"
+    follow_set: "&c&lNoChance &8» &7Seguir: {state}"
+    hud_set: "&c&lNoChance &8» &7HUD: {state}"
+    state_on: "&aON"
+    state_off: "&cOFF"
+    stats_header: "&c&lNoChance &8» &7Estadísticas de bloques:"
+    stats_breaks: "&8  ├ &7Rotos: &f{total} &8(&c{suspicious} sospechosos&8)"
+    stats_places: "&8  ├ &7Colocados: &f{total}"
+    stats_avg: "&8  ├ &7Promedio: &f{ms}ms"
+    stats_fastest: "&8  └ &7Más rápido: {color}{ms}ms &7({material})"
+  mgr:
+    already_watching: "&c&lNoChance &8» &7Ya estás viendo. Usa &f/nc replay stop &7primero."
+    load_failed: "&c&lNoChance &8» &7Fallo al cargar: {error}"
+    ended: "&c&lNoChance &8» &7Repetición de &f{player} &8(&7{type}&8) &7terminada"
+    not_watching: "&c&lNoChance &8» &7No estás viendo ninguna repetición."
+
+web:
+  endpoint_unreachable: "&c&lNoChance &8» &cNo se pudo contactar el panel web. Revisa el endpoint en config.yml y reintenta /nc web."
+  linked: "&c&lNoChance &8» &aServidor vinculado a &f{admin}&a!"
+  linked_server_id: "&7Server ID: &f{id}"

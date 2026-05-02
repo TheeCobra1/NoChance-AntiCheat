@@ -1,0 +1,489 @@
+# NoChance Anti-Cheat Config
+# tweak these to fit your server
+
+# auto-add new settings from plugin updates into this file
+# set to false if you prefer to manage the file yourself
+auto_update_config: true
+
+# language for console/non-player messages
+# player-visible messages auto-follow client locale unless force_server_language is true
+# supported: en, es, pt_BR, zh_CN, ru
+language: "en"
+
+# force every player to see messages in the server language above
+# set true to override each player's minecraft client locale
+force_server_language: false
+
+general:
+  # how long to remember violations (seconds)
+  # higher = stricter over time
+  time_window_seconds: 45
+
+  # new players get this many seconds before checks kick in
+  # helps avoid false flags on join lag
+  grace_period_seconds: 5
+
+  # extra grace after a teleport (pearls, commands, portals)
+  teleport_grace_period_seconds: 3
+
+  # need this many data points before flagging
+  # prevents random lag spikes from triggering
+  min_samples: 4
+
+  # server ops bypass all checks
+  op_exempt: true
+
+  # log + alert ops/bypass-perm players when flagged but never punish
+  # lets staff test cheats while staying visible in logs/web panel
+  op_detect_only: false
+
+  # tell player when flagged (leave false, tips off cheaters)
+  notify_player_on_flag: false
+
+# confidence = how sure we are someone's cheating
+# 0.0 = no idea, 1.0 = definitely cheating
+thresholds:
+  # might be cheating, worth watching
+  low_confidence: 0.55
+
+  # probably cheating, warn staff
+  medium_confidence: 0.70
+
+  # almost certainly cheating
+  high_confidence: 0.85
+
+  # 100% cheating, no question
+  extreme_confidence: 0.98
+
+# smart filtering to reduce false positives
+advanced_filtering:
+  enabled: true
+
+  # base assumption: 12% of flagged behavior is actual cheating
+  # lower = more strict, higher = more lenient
+  bayesian_prior: 0.12
+
+  # how many std deviations before flagging
+  # lower = catches more but more false positives
+  z_score_threshold: 1.8
+
+  # players need this trust level for leniency
+  # earned by playing legit over time
+  min_trust_score: 0.5
+
+  # checks needed before player has a baseline
+  established_baseline_checks: 20
+
+  # time needed before baseline (seconds)
+  established_baseline_time_seconds: 30
+
+# what happens when someone gets flagged
+actions:
+  kick_on_extreme_confidence: false
+  kick_on_high_confidence: true
+  warn_on_high_confidence: true
+  warn_on_medium_confidence: true
+  log_low_confidence: true
+
+  # teleport flagged player back to last legit ground spot
+  # only fires for movement cheats listed below
+  setback:
+    enabled: false
+    types: [FLY, FLY_HOVER, FLY_VERTICAL, FLY_GLIDE, SPEED, SPEED_GROUND, SPEED_AIR, SPEED_STRAFE, NOFALL, JESUS, GROUNDSPOOF, PHASE, NOCLIP, BLINK, STEP]
+
+  # run console commands when a player is flagged
+  # placeholders: %player% %type% %severity% %confidence% %details%
+  custom_commands:
+    enabled: false
+    on_low: []
+    on_medium: []
+    on_high: []
+    on_extreme: []
+
+# stats nerds can tweak these
+statistical:
+  # multiplier for standard deviation threshold
+  std_dev_multiplier: 2.5
+
+  # how many outliers before they count
+  outlier_forgiveness: 2
+
+  # CUSUM (Cumulative Sum) for trend detection
+  # drift parameter - higher = less sensitive
+  cusum_drift: 0.05
+  # threshold before CUSUM triggers (lower = quicker, higher = more lenient)
+  cusum_threshold: 0.6
+
+  # Welford's algorithm warmup
+  # checks needed before Welford statistics are reliable
+  welford_warmup_samples: 5
+
+# individual check settings
+# threshold = flags needed before action (lower = faster catch)
+# severity_multiplier = how bad this cheat is (higher = harsher punishment)
+checks:
+
+  # detects flying without elytra/creative
+  fly:
+    enabled: true
+    threshold: 1
+    severity_multiplier: 2.5
+    # max upward velocity (vanilla jump is ~0.42)
+    max_velocity_y: 0.55
+    # horizontal-fly detector (off by default, can FP on tall cliff falls)
+    # enable only if you've seen straight-line fly cheats slipping past speed
+    horizontal_enabled: false
+
+  # catches speed hacks, bhop, strafe
+  speed:
+    enabled: true
+    threshold: 1
+    severity_multiplier: 3.0
+    # base speed limit (blocks per tick)
+    max_speed: 0.32
+    # multiplier when sprinting
+    sprint_multiplier: 1.30
+    # multiplier on ice
+    ice_multiplier: 2.4
+
+  # walking through solid blocks
+  noclip:
+    enabled: true
+    threshold: 1
+    severity_multiplier: 3.5
+
+  # walking on water without frost walker
+  jesus:
+    enabled: true
+    threshold: 1
+    severity_multiplier: 3.0
+
+  # mining faster than possible
+  fastbreak:
+    enabled: true
+    # needs a few flags, mining can be laggy
+    threshold: 5
+    severity_multiplier: 2.0
+    # tolerance for break time (ms)
+    base_tolerance_ms: 35
+    # percentage tolerance on top
+    percentage_tolerance: 0.08
+    # instant break tolerance for shovels
+    shovel_instant_tolerance_ms: 30
+    shovel_instant_percentage: 0.15
+    # instant break tolerance for hand
+    hand_instant_tolerance_ms: 20
+    hand_instant_percentage: 0.12
+    trust_bonus_instant_ms: 0
+    trust_bonus_normal_ms: 0
+
+  # placing blocks too fast
+  fastplace:
+    enabled: true
+    threshold: 4
+    severity_multiplier: 2.0
+
+  # breaking multiple blocks at once
+  # catches nuker, fastmine, mass break
+  nuker:
+    enabled: true
+    threshold: 2
+    severity_multiplier: 3.5
+
+  # auto-aim, multi-aura, rotation hacks
+  killaura:
+    enabled: true
+    threshold: 4
+    severity_multiplier: 3.5
+    # vanilla reach is 3.0, slight tolerance
+    max_reach: 3.1
+    # max angle from where you're looking
+    max_angle: 35.0
+    # degrees per second rotation limit
+    max_rotation_speed: 1600.0
+    # clicks per second limit
+    max_cps: 15.0
+    # trusted players get +1 cps leeway
+    cps_trusted_bonus: 1.0
+    # untrusted get stricter limit
+    cps_untrusted_penalty: 3.0
+    # instant flag if this far over limit
+    instant_flag_cps_over: 4.0
+    # trusted players get extra angle leeway
+    angle_trusted_bonus: 5.0
+    # untrusted get stricter angle checks
+    angle_untrusted_penalty: 8.0
+    # instant flag if this many degrees off
+    instant_flag_angle_over: 12.0
+    # trusted players get rotation leeway (deg/sec)
+    rotation_trusted_bonus: 40.0
+    # untrusted get stricter rotation checks
+    rotation_untrusted_penalty: 60.0
+    # instant flag if rotation exceeds limit by this much
+    instant_flag_rotation_over: 100.0
+    # how consistent rotations are (bots are too perfect)
+    rotation_variance_threshold: 30.0
+    # stricter variance for established cheaters
+    rotation_variance_strict: 15.0
+    # violations needed to flag
+    required_violations: 3
+    # attack packet timing variance threshold
+    packet_variance_threshold: 20.0
+    # stricter packet variance for sus players
+    packet_variance_strict: 8.0
+    # max attacks per second via packets
+    packet_attack_rate_limit: 18
+
+  # no fall damage hack
+  nofall:
+    enabled: true
+    threshold: 1
+    severity_multiplier: 2.8
+
+  # clicking faster than humanly possible
+  autoclicker:
+    enabled: true
+    threshold: 2
+    severity_multiplier: 3.0
+    # jitter click can hit 14-16, so cap at 16
+    max_cps: 16
+
+  # hitting from too far away
+  reach:
+    enabled: true
+    threshold: 1
+    severity_multiplier: 3.5
+    # vanilla is 3.0, small buffer for lag
+    max_entity_reach: 3.15
+    # block interaction range
+    max_block_reach: 4.5
+
+  # moving items too fast in inventory
+  inventory:
+    enabled: true
+    threshold: 3
+    severity_multiplier: 2.5
+    max_clicks_per_second: 18
+
+  # auto-bridging, tower, godbridge
+  scaffold:
+    enabled: true
+    # needs a few flags, bridging can look sus
+    threshold: 3
+    severity_multiplier: 3.0
+
+  # game speed manipulation
+  timer:
+    enabled: true
+    threshold: 2
+    severity_multiplier: 3.5
+
+  # anti-knockback, reduced velocity
+  velocity:
+    enabled: true
+    threshold: 1
+    severity_multiplier: 3.5
+
+  # fake critical hits without jumping
+  criticals:
+    enabled: true
+    threshold: 2
+    severity_multiplier: 2.8
+
+  # walking through blocks (like noclip but different method)
+  phase:
+    enabled: true
+    threshold: 2
+    severity_multiplier: 3.2
+
+  # stepping up blocks without jumping
+  step:
+    enabled: true
+    threshold: 2
+    severity_multiplier: 2.5
+
+  # packet manipulation, lag switching
+  blink:
+    enabled: true
+    threshold: 2
+    severity_multiplier: 3.2
+
+  # moving full speed while eating/blocking/in webs
+  noslow:
+    enabled: true
+    threshold: 2
+    severity_multiplier: 3.0
+
+  # faking on-ground status
+  groundspoof:
+    enabled: true
+    threshold: 1
+    severity_multiplier: 3.5
+
+  # flying with elytra faster than allowed
+  elytrafly:
+    enabled: true
+    threshold: 6
+    severity_multiplier: 1.0
+    # blocks per tick max speed
+    max_speed: 3.1
+    # minimum descent rate (prevents hover)
+    min_glide_descent: -0.025
+    # how long firework boost lasts
+    firework_boost_duration_ms: 5000
+
+  # strider speed hacks in lava
+  strider:
+    enabled: true
+    threshold: 2
+    severity_multiplier: 2.6
+
+  # flying while in a boat
+  boatfly:
+    enabled: true
+    threshold: 2
+    severity_multiplier: 3.0
+    # 1.5 seconds max airtime
+    max_air_ticks: 30
+
+  # auto-tool swap before break
+  autotool:
+    enabled: false
+    threshold: 3
+    severity_multiplier: 2.0
+
+  # vein-mining ore chains
+  automine:
+    enabled: false
+    threshold: 8
+    severity_multiplier: 2.0
+
+  # auto-reel on bobber bite
+  autofish:
+    enabled: false
+    threshold: 3
+    severity_multiplier: 1.5
+
+  # vertical climb without ladder
+  spider:
+    enabled: false
+    threshold: 5
+    severity_multiplier: 2.5
+
+  # missing movement packets
+  disabler:
+    enabled: false
+    threshold: 1
+    severity_multiplier: 2.5
+
+  # rare-ore ratio heuristic
+  xray:
+    enabled: false
+    threshold: 1
+    severity_multiplier: 2.0
+    min_stone: 200
+    ratio_threshold: 0.05
+
+  # experimental physics-divergence flag for fly/speed
+  physics_validator:
+    enabled: false
+
+# where to store data
+database:
+  # SQLITE for small servers, MYSQL for networks
+  type: SQLITE
+  host: localhost
+  port: 3306
+  database: nochance
+  username: root
+  password: password
+  table_prefix: nc_
+
+# send alerts to discord
+discord:
+  enabled: false
+  # create webhook in discord server settings
+  webhook_url: ""
+
+# web dashboard integration
+# pair with /nc web while OP to link this server
+web:
+  enabled: true
+  # where the dashboard lives
+  endpoint: "https://nochance-ac.com"
+  # push anonymized telemetry to help tune the anti-cheat
+  telemetry: true
+  # contribute false-positive feedback for ML fine-tuning
+  share_learnings: true
+
+# ai-assisted post-filter
+# dashboard runs kNN + logistic regression on labeled flags
+# and sends verdicts back that nudge confidence up or down
+ai:
+  enabled: true
+  # max confidence adjustment per flag (+ or -)
+  max_adjustment: 0.40
+  # ignore verdicts weaker than this
+  min_agreement: 0.60
+  # how long a verdict stays valid for the same player+check
+  verdict_ttl_seconds: 600
+  # attach rich feature vectors (vl, x, y, z, velocity, ping, etc) to flag events
+  send_features: true
+
+# record player actions for review
+replay:
+  enabled: true
+  # keep this many seconds in memory
+  buffer_seconds: 30
+  # save this many seconds before violation
+  before_seconds: 10
+  # save this many seconds after violation
+  after_seconds: 15
+  # delete old replays after this many days
+  retention_days: 7
+  save_on_high: true
+  save_on_extreme: true
+
+# bedrock edition players (geyser/floodgate)
+bedrock:
+  # don't skip checks entirely, just adjust
+  exempt: false
+  # use looser thresholds for bedrock
+  relaxed_checks: true
+  # 30% more tolerance for bedrock quirks (capped at 1.3 to prevent fly/speed/killaura false negatives)
+  tolerance_multiplier: 1.3
+
+# adjust for high ping players
+ping_compensation:
+  enabled: true
+  # ms ping before considered "high"
+  high_ping_threshold: 120
+  # max tolerance boost (40% extra leeway)
+  max_multiplier: 1.4
+
+# player skill detection
+# used to tell apart good players from cheaters
+skill_profiles:
+  low:
+    max_cps: 8
+    min_cps: 3
+    max_rotation_speed: 200
+    min_rotation_speed: 100
+    max_accuracy: 0.50
+    min_accuracy: 0.25
+
+  medium:
+    max_cps: 12
+    min_cps: 7
+    max_rotation_speed: 350
+    min_rotation_speed: 180
+    max_accuracy: 0.68
+    min_accuracy: 0.45
+
+  high:
+    max_cps: 18
+    min_cps: 11
+    max_rotation_speed: 550
+    min_rotation_speed: 320
+    max_accuracy: 0.82
+    min_accuracy: 0.65
