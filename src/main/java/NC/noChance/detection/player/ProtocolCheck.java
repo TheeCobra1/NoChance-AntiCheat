@@ -2,7 +2,6 @@ package NC.noChance.detection.player;
 
 import NC.noChance.core.*;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

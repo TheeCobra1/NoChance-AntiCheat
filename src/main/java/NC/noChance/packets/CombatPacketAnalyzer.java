@@ -17,7 +17,6 @@ import java.util.logging.Level;
 public class CombatPacketAnalyzer {
     private final ACConfig config;
     private final Plugin plugin;
-    private static final int MAX_CPS_PACKETS = 30;
     private static final long AUTOCLICKER_VARIANCE_THRESHOLD = 5;
 
     public CombatPacketAnalyzer(ACConfig config, Plugin plugin) {

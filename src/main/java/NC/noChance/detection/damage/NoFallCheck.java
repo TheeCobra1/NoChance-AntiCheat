@@ -8,7 +8,6 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.GameMode;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -389,6 +388,7 @@ public class NoFallCheck {
         double y = loc.getY();
         double z = loc.getZ();
         org.bukkit.World world = loc.getWorld();
+        if (world == null) return true;
 
         double halfWidth = 0.3;
         double[][] offsets = {
@@ -399,15 +399,21 @@ public class NoFallCheck {
         for (double[] offset : offsets) {
             double checkX = x + offset[0];
             double checkZ = z + offset[1];
+            int bx = (int) Math.floor(checkX);
+            int bz = (int) Math.floor(checkZ);
+            if (!world.isChunkLoaded(bx >> 4, bz >> 4)) continue;
 
-            Block below = world.getBlockAt((int) Math.floor(checkX), (int) Math.floor(y - 0.1), (int) Math.floor(checkZ));
+            Block below = world.getBlockAt(bx, (int) Math.floor(y - 0.1), bz);
             if (isSupportBlock(below, y)) return true;
 
-            Block belowMore = world.getBlockAt((int) Math.floor(checkX), (int) Math.floor(y - 0.5), (int) Math.floor(checkZ));
+            Block belowMore = world.getBlockAt(bx, (int) Math.floor(y - 0.5), bz);
             if (isSupportBlock(belowMore, y)) return true;
         }
 
-        Material atFeet = world.getBlockAt((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z)).getType();
+        int fx = (int) Math.floor(x);
+        int fz = (int) Math.floor(z);
+        if (!world.isChunkLoaded(fx >> 4, fz >> 4)) return false;
+        Material atFeet = world.getBlockAt(fx, (int) Math.floor(y), fz).getType();
         if (atFeet.name().contains("CARPET")) return true;
         if (atFeet == Material.SNOW) return true;
         if (atFeet == Material.LILY_PAD) return true;
@@ -446,7 +452,9 @@ public class NoFallCheck {
 
     private double applyDamageReduction(Player player, double damage) {
         Location loc = player.getLocation();
-        Block below = loc.getWorld().getBlockAt(loc.getBlockX(), loc.getBlockY() - 1, loc.getBlockZ());
+        org.bukkit.World w = loc.getWorld();
+        if (w == null || !w.isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) return damage;
+        Block below = w.getBlockAt(loc.getBlockX(), loc.getBlockY() - 1, loc.getBlockZ());
         Material belowType = below.getType();
 
         if (belowType == Material.SLIME_BLOCK) return 0.0;
@@ -491,8 +499,10 @@ public class NoFallCheck {
 
     private boolean isInSafeLandingBlock(Player player) {
         Location loc = player.getLocation();
+        org.bukkit.World w = loc.getWorld();
+        if (w == null || !w.isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) return false;
         Material type = loc.getBlock().getType();
-        Material below = loc.getWorld().getBlockAt(loc.getBlockX(), loc.getBlockY() - 1, loc.getBlockZ()).getType();
+        Material below = w.getBlockAt(loc.getBlockX(), loc.getBlockY() - 1, loc.getBlockZ()).getType();
 
         if (type == Material.WATER || type == Material.LAVA) return true;
         if (type == Material.COBWEB) return true;

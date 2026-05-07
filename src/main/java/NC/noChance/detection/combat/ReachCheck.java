@@ -1,8 +1,6 @@
 package NC.noChance.detection.combat;
 
 import NC.noChance.core.*;
-import NC.noChance.core.EnvironmentHelper;
-import NC.noChance.core.VersionAdapter;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -47,10 +45,6 @@ public class ReachCheck {
         int count;
         long lastTime;
         double maxOver;
-    }
-
-    public static void notePunchHit(UUID targetId) {
-        PUNCH_HITS.put(targetId, System.currentTimeMillis());
     }
 
     private KillAuraCheck killAuraCheck;
@@ -169,7 +163,8 @@ public class ReachCheck {
             }
         }
 
-        maxReach = Math.min(maxReach, baseReach + 1.0);
+        double maxBonus = (ping > 200 ? 0.85 : (ping > 100 ? 0.65 : 0.45));
+        maxReach = Math.min(maxReach, baseReach + maxBonus);
 
         double hDist = PrecisionReach.getHorizontalDistance(eyeLoc, target.getLocation());
         double vDist = PrecisionReach.getVerticalDistance(eyeLoc, target.getLocation());
@@ -187,8 +182,9 @@ public class ReachCheck {
             }
             hits.lastTime = now;
 
-            boolean egregious = over >= 1.0;
-            if (!egregious && hits.count < 2) {
+            boolean egregious = over >= 0.6;
+            boolean clearOver = over >= 0.30;
+            if (!egregious && (!clearOver || hits.count < 2)) {
                 return CheckResult.passed();
             }
 

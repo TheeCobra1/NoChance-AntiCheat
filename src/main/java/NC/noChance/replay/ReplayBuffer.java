@@ -11,7 +11,6 @@ import org.bukkit.util.Vector;
 import java.util.*;
 
 public class ReplayBuffer {
-    private static final int GLOBAL_BLOCK_ACTION_CAP = 50_000;
     private static final int PER_PLAYER_BLOCK_CAP = 250;
     private final int capacity;
     private final Deque<Snapshot> buffer;

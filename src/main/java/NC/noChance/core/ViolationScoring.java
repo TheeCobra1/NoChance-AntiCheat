@@ -157,7 +157,13 @@ public class ViolationScoring {
         ConfidenceLevel confidence = getConfidenceLevel(finalScore);
 
         if (confidence == ConfidenceLevel.NONE) {
-            return;
+            if (validationConfidence != null && validationConfidence != MultiLayerValidator.ConfidenceLevel.NONE) {
+                confidence = mapMlvConfidence(validationConfidence);
+            } else if (result.getSeverity() >= 0.85) {
+                confidence = ConfidenceLevel.LOW;
+            } else {
+                return;
+            }
         }
 
         data.incrementTotalViolations();
@@ -246,6 +252,16 @@ public class ViolationScoring {
 
             data.updateBaseline(key + "_variance", variance);
             data.updateBaseline(key + "_stddev", stdDev);
+        }
+    }
+
+    private ConfidenceLevel mapMlvConfidence(MultiLayerValidator.ConfidenceLevel mlv) {
+        switch (mlv) {
+            case EXTREME: return ConfidenceLevel.EXTREME;
+            case HIGH: return ConfidenceLevel.HIGH;
+            case MEDIUM: return ConfidenceLevel.MEDIUM;
+            case LOW: return ConfidenceLevel.LOW;
+            default: return ConfidenceLevel.NONE;
         }
     }
 

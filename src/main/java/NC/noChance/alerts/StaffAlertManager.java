@@ -10,7 +10,6 @@ import NC.noChance.web.WebBridge;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
@@ -141,12 +140,13 @@ public class StaffAlertManager {
 
     private void addToBatch(AlertEntry entry) {
         AlertBatch batch = pendingBatches.computeIfAbsent(entry.playerId,
-                k -> new AlertBatch(entry.playerName, entry.playerId, entry.location, entry.ping, entry.bedrock));
+                k -> new AlertBatch(entry.playerId));
         batch.add(entry);
 
         if (batch.alerts.size() >= MAX_BATCH_SIZE) {
-            pendingBatches.remove(entry.playerId);
-            sendBatchedAlert(batch);
+            if (pendingBatches.remove(entry.playerId, batch)) {
+                sendBatchedAlert(batch);
+            }
         }
     }
 
@@ -188,6 +188,18 @@ public class StaffAlertManager {
             }
         }
 
+        AlertEntry latest = batch.alerts.get(batch.alerts.size() - 1);
+        String name = latest.playerName;
+        Location loc = latest.location;
+        int ping = latest.ping;
+        boolean bedrock = latest.bedrock;
+        Player live = Bukkit.getPlayer(batch.playerId);
+        if (live != null) {
+            name = live.getName();
+            loc = live.getLocation();
+            ping = Math.max(0, live.getPing());
+        }
+
         String confColor = getColorByConfidence(worstConfidence);
         StringBuilder typeStr = new StringBuilder();
         int i = 0;
@@ -201,12 +213,12 @@ public class StaffAlertManager {
         }
 
         String tpCommand = String.format("/tp %s %d %d %d",
-                batch.playerName,
-                batch.location.getBlockX(),
-                batch.location.getBlockY(),
-                batch.location.getBlockZ());
+                name,
+                loc.getBlockX(),
+                loc.getBlockY(),
+                loc.getBlockZ());
 
-        String bedrockTag = batch.bedrock ? " §d[BE]" : "";
+        String bedrockTag = bedrock ? " §d[BE]" : "";
 
         TextComponent prefix = new TextComponent(lang("prefix"));
 
@@ -227,10 +239,10 @@ public class StaffAlertManager {
             batchClientHint = packetFingerprint.getRecentClient(batch.playerId);
         }
 
-        TextComponent playerComp = new TextComponent("§7" + batch.playerName + bedrockTag + " ");
+        TextComponent playerComp = new TextComponent("§7" + name + bedrockTag + " ");
         playerComp.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, tpCommand));
         playerComp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                new Text(lang("alert.click_teleport") + "\n" + lang("alert.ping", "ping", batch.ping))));
+                new Text(lang("alert.click_teleport") + "\n" + lang("alert.ping", "ping", ping))));
 
         TextComponent scoreComp = new TextComponent(confColor + String.format("%.0f%%", maxScore * 100));
         if (batch.alerts.size() > 1) {
@@ -238,11 +250,11 @@ public class StaffAlertManager {
         }
 
         TextComponent actions = new TextComponent(" §8[§7⚡§8]");
-        actions.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nc freeze " + batch.playerName));
+        actions.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nc freeze " + name));
         actions.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(lang("alert.click_freeze"))));
 
         TextComponent spectate = new TextComponent(" §8[§7👁§8]");
-        spectate.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nc spectate " + batch.playerName));
+        spectate.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nc spectate " + name));
         spectate.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(lang("alert.click_spectate"))));
 
         prefix.addExtra(typeComp);
@@ -294,10 +306,19 @@ public class StaffAlertManager {
     }
 
     private String buildBatchHover(AlertBatch batch) {
+        AlertEntry latest = batch.alerts.get(batch.alerts.size() - 1);
+        String name = latest.playerName;
+        int ping = latest.ping;
+        Player live = Bukkit.getPlayer(batch.playerId);
+        if (live != null) {
+            name = live.getName();
+            ping = Math.max(0, live.getPing());
+        }
+
         StringBuilder sb = new StringBuilder();
-        sb.append("§7Player: §e").append(batch.playerName).append("\n");
+        sb.append("§7Player: §e").append(name).append("\n");
         sb.append("§7Flags: §f").append(batch.alerts.size()).append("\n");
-        sb.append("§7Ping: §f").append(batch.ping).append("ms\n");
+        sb.append("§7Ping: §f").append(ping).append("ms\n");
         sb.append("§8───────────────\n");
 
         int shown = 0;
@@ -717,11 +738,9 @@ public class StaffAlertManager {
         final String confidenceLevel;
         final double score;
         final String detectionMethod;
-        final String variant;
         final Location location;
         final int ping;
         final boolean bedrock;
-        final long timestamp;
 
         AlertEntry(String playerName, UUID playerId, ViolationType type, double severity,
                    String details, String confidenceLevel, double score, String detectionMethod,
@@ -734,29 +753,19 @@ public class StaffAlertManager {
             this.confidenceLevel = confidenceLevel;
             this.score = score;
             this.detectionMethod = detectionMethod;
-            this.variant = variant;
             this.location = location;
             this.ping = ping;
             this.bedrock = bedrock;
-            this.timestamp = System.currentTimeMillis();
         }
     }
 
     private static class AlertBatch {
-        final String playerName;
         final UUID playerId;
-        final Location location;
-        final int ping;
-        final boolean bedrock;
         final long firstAlert;
         final List<AlertEntry> alerts;
 
-        AlertBatch(String playerName, UUID playerId, Location location, int ping, boolean bedrock) {
-            this.playerName = playerName;
+        AlertBatch(UUID playerId) {
             this.playerId = playerId;
-            this.location = location;
-            this.ping = ping;
-            this.bedrock = bedrock;
             this.firstAlert = System.currentTimeMillis();
             this.alerts = new java.util.concurrent.CopyOnWriteArrayList<>();
         }

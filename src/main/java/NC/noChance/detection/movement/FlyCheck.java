@@ -1,7 +1,6 @@
 package NC.noChance.detection.movement;
 
 import NC.noChance.core.*;
-import NC.noChance.core.ViaHelper;
 import NC.noChance.predict.PhysicsValidator;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -125,7 +124,13 @@ public class FlyCheck {
                 data.incrementAirTicks();
                 data.setWasOnGround(false);
             }
-            flyData.decrementViolationCount();
+            if (!onGround && avgTickVelocity > 0.10 && data.getAirTicks() > 8) {
+                flyData.incrementViolationCount();
+                if (flyData.getViolationCount() >= 4) {
+                    return CheckResult.failed(ViolationType.FLY, 0.55,
+                            String.format("Batched ascent: avgDy=%.3f over %d ticks (air=%d)", avgTickVelocity, ticksElapsed, data.getAirTicks()));
+                }
+            }
             return CheckResult.passed();
         }
 

@@ -221,11 +221,6 @@ public class StepCheck {
         trackers.remove(uuid);
     }
 
-    public void notePistonExtend(UUID uuid) {
-        StepTracker tracker = trackers.computeIfAbsent(uuid, k -> new StepTracker());
-        tracker.lastPistonExtendTick = System.currentTimeMillis();
-    }
-
     private static class StepTracker {
         private int violations = 0;
         private long lastViolation = 0;

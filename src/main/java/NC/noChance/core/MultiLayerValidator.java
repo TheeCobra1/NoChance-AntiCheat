@@ -161,7 +161,15 @@ public class MultiLayerValidator {
         }
         double effectiveThreshold = originalSeverity >= 0.80 ? 0.22 : 0.30;
         if (combinedConfidence < effectiveThreshold) {
-            return ValidationResult.inconclusive();
+            boolean rescue = originalSeverity >= 0.80
+                    || (baseFlag && baseConfidence >= 0.70)
+                    || (packetFlag && packetConfidence >= 0.85)
+                    || (advancedFlag && advancedConfidence >= 0.80);
+            if (rescue) {
+                combinedConfidence = Math.max(combinedConfidence, originalSeverity * 0.85);
+            } else {
+                return ValidationResult.inconclusive();
+            }
         }
 
         if (systemsTriggered >= 3) {

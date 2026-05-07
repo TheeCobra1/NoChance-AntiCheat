@@ -1,7 +1,6 @@
 package NC.noChance.detection.movement;
 
 import NC.noChance.core.*;
-import NC.noChance.core.VersionAdapter;
 import NC.noChance.predict.PhysicsValidator;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -499,7 +498,8 @@ public class SpeedCheck {
         }
 
         double tps = getTPS();
-        double tpsMultiplier = 20.0 / Math.max(tps, 10.0);
+        if (tps < 15.0) return CheckResult.passed();
+        double tpsMultiplier = Math.min(1.30, 20.0 / Math.max(tps, 15.5));
 
         double timeInSeconds = Math.max(timeDelta / 1000.0, 0.05);
         double actualSpeed = horizontalDist / timeInSeconds;
@@ -1027,7 +1027,8 @@ public class SpeedCheck {
         }
 
         double tps = getTPS();
-        double tpsMultiplier = 20.0 / Math.max(tps, 10.0);
+        if (tps < 15.0) return CheckResult.passed();
+        double tpsMultiplier = Math.min(1.30, 20.0 / Math.max(tps, 15.5));
 
         double timeInSeconds = Math.max(timeDelta / 1000.0, 0.05);
         double actualSpeed = horizontalDist / timeInSeconds;
@@ -1131,7 +1132,8 @@ public class SpeedCheck {
         }
 
         double tps = getTPS();
-        double tpsMultiplier = 20.0 / Math.max(tps, 10.0);
+        if (tps < 15.0) return CheckResult.passed();
+        double tpsMultiplier = Math.min(1.30, 20.0 / Math.max(tps, 15.5));
 
         double timeInSeconds = Math.max(timeDelta / 1000.0, 0.05);
         double actualSpeed = horizontalDist / timeInSeconds;
@@ -1222,7 +1224,8 @@ public class SpeedCheck {
         }
 
         double tps = getTPS();
-        double tpsMultiplier = 20.0 / Math.max(tps, 10.0);
+        if (tps < 15.0) return CheckResult.passed();
+        double tpsMultiplier = Math.min(1.30, 20.0 / Math.max(tps, 15.5));
 
         double timeInSeconds = Math.max(timeDelta / 1000.0, 0.05);
         double actualSpeed = totalDist / timeInSeconds;

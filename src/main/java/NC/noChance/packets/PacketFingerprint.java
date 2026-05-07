@@ -226,11 +226,6 @@ public class PacketFingerprint {
         observationLogged.remove(player);
     }
 
-    public boolean inObservation(UUID player) {
-        long t = joinTime.getOrDefault(player, 0L);
-        return t == 0L || System.currentTimeMillis() - t < OBSERVATION_MS;
-    }
-
     public void cleanup(UUID player) {
         windows.remove(player);
         joinTime.remove(player);

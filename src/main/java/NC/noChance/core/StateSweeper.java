@@ -36,7 +36,7 @@ public class StateSweeper {
 
     public void start() {
         if (task != null) return;
-        task = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, this::sweep, PERIOD_TICKS, PERIOD_TICKS);
+        task = Bukkit.getScheduler().runTaskTimer(plugin, this::sweep, PERIOD_TICKS, PERIOD_TICKS);
     }
 
     public BukkitTask getTask() {

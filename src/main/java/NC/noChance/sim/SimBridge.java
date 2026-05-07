@@ -129,11 +129,6 @@ public class SimBridge {
         clearDev(id);
     }
 
-    public void applyKnockback(UUID id, double vx, double vy, double vz) {
-        engine.applyKnockback(id, vx, vy, vz);
-        clearDev(id);
-    }
-
     public void markDimensionChange(UUID id) {
         lastWorld.remove(id);
         engine.resetPlayer(id);

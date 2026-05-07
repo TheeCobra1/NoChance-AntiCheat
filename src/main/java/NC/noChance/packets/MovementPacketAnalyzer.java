@@ -18,8 +18,6 @@ import java.util.logging.Logger;
 
 public class MovementPacketAnalyzer {
     private final ACConfig config;
-    private static final double GRAVITY = 0.08;
-    private static final double MAX_LEGIT_SPEED = 0.6;
     private static final int PACKET_RATE_THRESHOLD = 25;
 
     public MovementPacketAnalyzer(ACConfig config) {

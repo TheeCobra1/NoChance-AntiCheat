@@ -61,8 +61,11 @@ public class AsyncCheckProcessor {
                     try {
                         Object result = task.callable.call();
                         task.future.complete(result);
-                    } catch (Exception e) {
-                        task.future.completeExceptionally(e);
+                    } catch (Throwable t) {
+                        task.future.completeExceptionally(t);
+                        if (t instanceof Error && !(t instanceof StackOverflowError)) {
+                            throw (Error) t;
+                        }
                     }
 
                     if (queue.isEmpty()) {

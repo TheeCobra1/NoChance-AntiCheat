@@ -2,7 +2,6 @@ package NC.noChance.detection.combat;
 
 import NC.noChance.core.*;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
@@ -428,10 +427,6 @@ public class AutoClickerCheck {
             return ClickType.JITTER;
         }
 
-        if (cps > BUTTERFLY_MAX_CPS) {
-            return ClickType.DRAG;
-        }
-
         return ClickType.NORMAL;
     }
 
@@ -492,19 +487,12 @@ public class AutoClickerCheck {
 
     private double getSlowdownCpsMultiplier(Player player) {
         double mult = 1.0;
-        PotionEffectType slownessType = PotionEffectType.getByName("SLOWNESS");
-        if (slownessType == null) slownessType = PotionEffectType.getByName("SLOW");
-        if (slownessType != null && player.hasPotionEffect(slownessType)) {
-            mult *= 1.30;
-        }
         PotionEffectType fatigueType = PotionEffectType.getByName("MINING_FATIGUE");
         if (fatigueType == null) fatigueType = PotionEffectType.getByName("SLOW_DIGGING");
         if (fatigueType != null && player.hasPotionEffect(fatigueType)) {
-            PotionEffect effect = player.getPotionEffect(fatigueType);
-            int amp = effect != null ? effect.getAmplifier() : 0;
-            mult *= 1.0 + 0.30 * (amp + 1);
+            mult *= 1.10;
         }
-        return mult;
+        return Math.min(1.15, mult);
     }
 
     public static double[] computeAutocorrelation(double[] intervals) {

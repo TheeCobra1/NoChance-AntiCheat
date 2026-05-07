@@ -406,7 +406,7 @@ public class PlayerListener implements Listener {
             || type == Material.CARTOGRAPHY_TABLE;
     }
 
-    private void cleanupPlayer(UUID playerId) {
+    public void cleanupPlayer(UUID playerId) {
         if (playerDataMap.remove(playerId) == null) return;
         multiLayerValidator.cleanupPlayer(playerId);
         checks.cleanupPlayer(playerId);

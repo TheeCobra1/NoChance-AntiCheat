@@ -41,7 +41,18 @@ import java.util.logging.Logger;
 public class FakePlayer {
     private static final AtomicInteger NEXT_ID = new AtomicInteger(
             ThreadLocalRandom.current().nextInt(100000, 900000));
-    private static final Map<UUID, TextureProperty> SKIN_CACHE = new ConcurrentHashMap<>();
+    private static final int SKIN_CACHE_MAX = 64;
+    private static final Map<UUID, TextureProperty> SKIN_CACHE =
+            Collections.synchronizedMap(new LinkedHashMap<UUID, TextureProperty>(SKIN_CACHE_MAX + 1, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<UUID, TextureProperty> eldest) {
+                    return size() > SKIN_CACHE_MAX;
+                }
+            });
+
+    public static void clearSkinCache() {
+        SKIN_CACHE.clear();
+    }
 
     private final Player viewer;
     private final World world;
@@ -58,7 +69,6 @@ public class FakePlayer {
     private volatile boolean sprinting;
     private volatile boolean gliding;
     private volatile boolean swimming;
-    private volatile boolean blocking;
 
     public FakePlayer(Player viewer, String name, World world) {
         this(viewer, name, world, NamedTextColor.GRAY, null);
@@ -116,24 +126,6 @@ public class FakePlayer {
                 Logger.getLogger("NoChance").log(Level.WARNING, "Failed to fetch skin async for " + playerUuid, e);
             }
         });
-    }
-
-    public void applySkinSync(UUID playerUuid) {
-        TextureProperty cached = SKIN_CACHE.get(playerUuid);
-        if (cached != null) {
-            profile.setTextureProperties(List.of(cached));
-            return;
-        }
-
-        try {
-            TextureProperty tex = fetchSkin(playerUuid);
-            if (tex != null) {
-                SKIN_CACHE.put(playerUuid, tex);
-                profile.setTextureProperties(List.of(tex));
-            }
-        } catch (Exception e) {
-            Logger.getLogger("NoChance").log(Level.WARNING, "Failed to apply skin sync for " + playerUuid, e);
-        }
     }
 
     private TextureProperty fetchSkin(UUID uuid) {
@@ -263,12 +255,6 @@ public class FakePlayer {
         sendFlags();
     }
 
-    public void setBlocking(boolean val) {
-        if (!spawned || blocking == val) return;
-        blocking = val;
-        sendHandState();
-    }
-
     public void setEquipment(Material mainHand, Material offHand,
                              Material helmet, Material chest, Material legs, Material boots) {
         if (!spawned) return;
@@ -356,25 +342,6 @@ public class FakePlayer {
 
         List<EntityData<?>> meta = List.of(new EntityData<>(0, EntityDataTypes.BYTE, flags));
         send(new WrapperPlayServerEntityMetadata(entityId, meta));
-    }
-
-    private void sendHandState() {
-        try {
-            byte handFlags = blocking ? (byte) 0x01 : (byte) 0x00;
-            List<EntityData<?>> meta = List.of(new EntityData<>(8, EntityDataTypes.BYTE, handFlags));
-            send(new WrapperPlayServerEntityMetadata(entityId, meta));
-        } catch (Exception e) {
-            Logger.getLogger("NoChance").log(Level.WARNING, "Failed to send hand state to " + viewer.getName(), e);
-        }
-    }
-
-    private void sendSkinParts() {
-        try {
-            List<EntityData<?>> meta = List.of(new EntityData<>(17, EntityDataTypes.BYTE, (byte) 0x7F));
-            send(new WrapperPlayServerEntityMetadata(entityId, meta));
-        } catch (Exception e) {
-            Logger.getLogger("NoChance").log(Level.WARNING, "Failed to send skin parts to " + viewer.getName(), e);
-        }
     }
 
     private void sendHeadRotation() {

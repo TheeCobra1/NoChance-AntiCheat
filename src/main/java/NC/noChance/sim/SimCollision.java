@@ -24,6 +24,7 @@ public class SimCollision {
 
         for (int bx = minBX; bx <= maxBX; bx++) {
             for (int bz = minBZ; bz <= maxBZ; bz++) {
+                if (!world.isChunkLoaded(bx >> 4, bz >> 4)) continue;
                 Material type = world.getBlockAt(bx, bY, bz).getType();
                 if (isCollidable(type)) {
                     return true;
@@ -43,8 +44,9 @@ public class SimCollision {
         int bMaxZ = (int) Math.floor(maxZ);
 
         for (int bx = bMinX; bx <= bMaxX; bx++) {
-            for (int by = bMinY; by <= bMaxY; by++) {
-                for (int bz = bMinZ; bz <= bMaxZ; bz++) {
+            for (int bz = bMinZ; bz <= bMaxZ; bz++) {
+                if (!world.isChunkLoaded(bx >> 4, bz >> 4)) continue;
+                for (int by = bMinY; by <= bMaxY; by++) {
                     Material type = world.getBlockAt(bx, by, bz).getType();
                     if (isCollidable(type)) {
                         return true;

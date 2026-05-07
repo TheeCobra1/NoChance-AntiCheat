@@ -273,13 +273,6 @@ public class NoClipCheck {
         return CheckResult.passed();
     }
 
-    private BoundingBox getPlayerBoundingBox(Location loc) {
-        return new BoundingBox(
-            loc.getX() - HALF_WIDTH, loc.getY(), loc.getZ() - HALF_WIDTH,
-            loc.getX() + HALF_WIDTH, loc.getY() + PLAYER_HEIGHT, loc.getZ() + HALF_WIDTH
-        );
-    }
-
     private double calculateOverlapVolume(BoundingBox a, BoundingBox b) {
         double overlapX = Math.max(0, Math.min(a.getMaxX(), b.getMaxX()) - Math.max(a.getMinX(), b.getMinX()));
         double overlapY = Math.max(0, Math.min(a.getMaxY(), b.getMaxY()) - Math.max(a.getMinY(), b.getMinY()));

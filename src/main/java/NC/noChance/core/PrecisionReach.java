@@ -10,7 +10,6 @@ public class PrecisionReach {
 
     private static final double E8_PRECISION = 0.00000001;
     private static final double MAX_ENTITY_REACH = 3.0;
-    private static final double MAX_ENTITY_REACH_STRICT = 3.005;
     private static final double MAX_BLOCK_REACH = 4.5;
     private static final double PING_COMPENSATION_BASE = 0.001;
     private static final double PING_COMPENSATION_MAX = 0.55;

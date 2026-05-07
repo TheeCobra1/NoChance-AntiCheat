@@ -616,6 +616,8 @@ public class NoSlowCheck {
         }
 
         Location loc = player.getLocation();
+        org.bukkit.World w = loc.getWorld();
+        if (w == null) return false;
         double px = loc.getX();
         double pz = loc.getZ();
         int bx = loc.getBlockX();
@@ -625,24 +627,24 @@ public class NoSlowCheck {
         double fx = px - bx;
         double fz = pz - bz;
 
-        if (fx < 0.3) {
-            Block side = loc.getWorld().getBlockAt(bx - 1, by, bz);
-            Block sideUp = loc.getWorld().getBlockAt(bx - 1, by + 1, bz);
+        if (fx < 0.3 && w.isChunkLoaded((bx - 1) >> 4, bz >> 4)) {
+            Block side = w.getBlockAt(bx - 1, by, bz);
+            Block sideUp = w.getBlockAt(bx - 1, by + 1, bz);
             if (side.getType() == Material.HONEY_BLOCK || sideUp.getType() == Material.HONEY_BLOCK) return true;
         }
-        if (fx > 0.7) {
-            Block side = loc.getWorld().getBlockAt(bx + 1, by, bz);
-            Block sideUp = loc.getWorld().getBlockAt(bx + 1, by + 1, bz);
+        if (fx > 0.7 && w.isChunkLoaded((bx + 1) >> 4, bz >> 4)) {
+            Block side = w.getBlockAt(bx + 1, by, bz);
+            Block sideUp = w.getBlockAt(bx + 1, by + 1, bz);
             if (side.getType() == Material.HONEY_BLOCK || sideUp.getType() == Material.HONEY_BLOCK) return true;
         }
-        if (fz < 0.3) {
-            Block side = loc.getWorld().getBlockAt(bx, by, bz - 1);
-            Block sideUp = loc.getWorld().getBlockAt(bx, by + 1, bz - 1);
+        if (fz < 0.3 && w.isChunkLoaded(bx >> 4, (bz - 1) >> 4)) {
+            Block side = w.getBlockAt(bx, by, bz - 1);
+            Block sideUp = w.getBlockAt(bx, by + 1, bz - 1);
             if (side.getType() == Material.HONEY_BLOCK || sideUp.getType() == Material.HONEY_BLOCK) return true;
         }
-        if (fz > 0.7) {
-            Block side = loc.getWorld().getBlockAt(bx, by, bz + 1);
-            Block sideUp = loc.getWorld().getBlockAt(bx, by + 1, bz + 1);
+        if (fz > 0.7 && w.isChunkLoaded(bx >> 4, (bz + 1) >> 4)) {
+            Block side = w.getBlockAt(bx, by, bz + 1);
+            Block sideUp = w.getBlockAt(bx, by + 1, bz + 1);
             if (side.getType() == Material.HONEY_BLOCK || sideUp.getType() == Material.HONEY_BLOCK) return true;
         }
 

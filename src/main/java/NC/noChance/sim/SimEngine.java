@@ -60,11 +60,12 @@ public class SimEngine {
         sp.setClimbing(player.isClimbing());
 
         World world = player.getWorld();
-        boolean onGround = SimCollision.isOnGround(world, to.getX(), to.getY(), to.getZ());
-
+        if (world == null) return CheckResult.passed();
         int belowX = (int) Math.floor(to.getX());
         int belowY = (int) Math.floor(to.getY()) - 1;
         int belowZ = (int) Math.floor(to.getZ());
+        if (!world.isChunkLoaded(belowX >> 4, belowZ >> 4)) return CheckResult.passed();
+        boolean onGround = SimCollision.isOnGround(world, to.getX(), to.getY(), to.getZ());
         Material below = world.getBlockAt(belowX, belowY, belowZ).getType();
         double slip = SimCollision.getBlockSlipperiness(below);
 

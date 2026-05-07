@@ -6,20 +6,16 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerDigging;
-import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import org.bukkit.entity.Player;
-import org.bukkit.Location;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class BlockPacketAnalyzer {
-    private final ACConfig config;
     private static final int MAX_BLOCKS_PER_SECOND = 20;
     private static final double MAX_BLOCK_REACH = 5.0;
 
     public BlockPacketAnalyzer(ACConfig config) {
-        this.config = config;
     }
 
     public void analyzeBlockPacket(PacketReceiveEvent event, Player player, PacketAnalyzer.PacketData data) {
@@ -29,22 +25,15 @@ public class BlockPacketAnalyzer {
             if (event.getPacketType() == PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT) {
                 try {
                     WrapperPlayClientPlayerBlockPlacement wrapper = new WrapperPlayClientPlayerBlockPlacement(event);
-                    data.setMetadata("lastPlaceX", wrapper.getBlockPosition().getX());
-                    data.setMetadata("lastPlaceY", wrapper.getBlockPosition().getY());
-                    data.setMetadata("lastPlaceZ", wrapper.getBlockPosition().getZ());
+                    int bx = wrapper.getBlockPosition().getX();
+                    int by = wrapper.getBlockPosition().getY();
+                    int bz = wrapper.getBlockPosition().getZ();
+                    data.setMetadata("lastPlaceX", bx);
+                    data.setMetadata("lastPlaceY", by);
+                    data.setMetadata("lastPlaceZ", bz);
                     data.setMetadata("lastPlaceTime", System.currentTimeMillis());
-
-                    if (player.getWorld() != null) {
-                        Location blockLoc = new Location(player.getWorld(),
-                                wrapper.getBlockPosition().getX(),
-                                wrapper.getBlockPosition().getY(),
-                                wrapper.getBlockPosition().getZ());
-                        Location playerLoc = player.getLocation();
-                        if (playerLoc.getWorld() != null && playerLoc.getWorld().equals(blockLoc.getWorld())) {
-                            double distance = playerLoc.distance(blockLoc);
-                            data.setMetadata("lastPlaceDistance", distance);
-                        }
-                    }
+                    Double pd = packetDistanceTo(data, bx, by, bz);
+                    if (pd != null) data.setMetadata("lastPlaceDistance", pd);
                 } catch (Exception e) {
                     Logger.getLogger("NoChance").log(Level.WARNING, "Failed to analyze block placement packet", e);
                 }
@@ -53,30 +42,33 @@ public class BlockPacketAnalyzer {
             if (event.getPacketType() == PacketType.Play.Client.PLAYER_DIGGING) {
                 try {
                     WrapperPlayClientPlayerDigging wrapper = new WrapperPlayClientPlayerDigging(event);
-                    data.setMetadata("lastDigX", wrapper.getBlockPosition().getX());
-                    data.setMetadata("lastDigY", wrapper.getBlockPosition().getY());
-                    data.setMetadata("lastDigZ", wrapper.getBlockPosition().getZ());
+                    int bx = wrapper.getBlockPosition().getX();
+                    int by = wrapper.getBlockPosition().getY();
+                    int bz = wrapper.getBlockPosition().getZ();
+                    data.setMetadata("lastDigX", bx);
+                    data.setMetadata("lastDigY", by);
+                    data.setMetadata("lastDigZ", bz);
                     data.setMetadata("lastDigTime", System.currentTimeMillis());
-
-                    if (player.getWorld() != null) {
-                        Location blockLoc = new Location(player.getWorld(),
-                                wrapper.getBlockPosition().getX(),
-                                wrapper.getBlockPosition().getY(),
-                                wrapper.getBlockPosition().getZ());
-                        Location playerLoc = player.getLocation();
-                        if (playerLoc.getWorld() != null && playerLoc.getWorld().equals(blockLoc.getWorld())) {
-                            double distance = playerLoc.distance(blockLoc);
-                            data.setMetadata("lastDigDistance", distance);
-                        }
-                    }
+                    Double pd = packetDistanceTo(data, bx, by, bz);
+                    if (pd != null) data.setMetadata("lastDigDistance", pd);
                 } catch (Exception e) {
                     Logger.getLogger("NoChance").log(Level.WARNING, "Failed to analyze block dig packet", e);
                 }
             }
         } catch (Exception e) {
             Logger.getLogger("NoChance").log(Level.WARNING, "Failed to analyze block packet", e);
-            return;
         }
+    }
+
+    private static Double packetDistanceTo(PacketAnalyzer.PacketData data, int bx, int by, int bz) {
+        Object px = data.getMetadata("lastPacketX");
+        Object py = data.getMetadata("lastPacketY");
+        Object pz = data.getMetadata("lastPacketZ");
+        if (!(px instanceof Double) || !(py instanceof Double) || !(pz instanceof Double)) return null;
+        double dx = (double) px - (bx + 0.5);
+        double dy = (double) py - (by + 0.5);
+        double dz = (double) pz - (bz + 0.5);
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
     public PacketAnalyzer.PacketViolationResult checkBlockViolation(Player player, PacketAnalyzer.PacketData data, ViolationType type) {

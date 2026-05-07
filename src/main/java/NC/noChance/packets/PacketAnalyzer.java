@@ -22,6 +22,7 @@ public class PacketAnalyzer {
     private final ACConfig config;
     private final BlinkCheck blinkCheck;
     private PacketFingerprint packetFingerprint;
+    private PacketListenerAbstract registeredListener;
 
     public PacketAnalyzer(Plugin plugin, ACConfig config, BlinkCheck blinkCheck) {
         this.plugin = plugin;
@@ -39,8 +40,19 @@ public class PacketAnalyzer {
         this.packetFingerprint = packetFingerprint;
     }
 
+    public void shutdown() {
+        if (registeredListener != null) {
+            try {
+                PacketEvents.getAPI().getEventManager().unregisterListener(registeredListener);
+            } catch (Throwable ignored) {
+            }
+            registeredListener = null;
+        }
+        packetDataMap.clear();
+    }
+
     private void registerPacketListeners() {
-        PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
+        registeredListener = new PacketListenerAbstract() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 Player player = null;
@@ -87,7 +99,8 @@ public class PacketAnalyzer {
                     }
                 }
             }
-        });
+        };
+        PacketEvents.getAPI().getEventManager().registerListener(registeredListener);
     }
 
     public PacketViolationResult analyzeForViolations(Player player, ViolationType type) {

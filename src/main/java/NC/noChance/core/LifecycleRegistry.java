@@ -63,8 +63,13 @@ public class LifecycleRegistry {
         return registerBukkitTask(task);
     }
 
-    public BukkitTask registerBukkitTask(BukkitTask task) {
-        if (task != null) tasks.add(task);
+    public synchronized BukkitTask registerBukkitTask(BukkitTask task) {
+        if (task != null) {
+            tasks.removeIf(t -> {
+                try { return t.isCancelled(); } catch (Throwable ex) { return false; }
+            });
+            tasks.add(task);
+        }
         return task;
     }
 

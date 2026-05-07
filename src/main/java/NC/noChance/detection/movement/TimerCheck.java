@@ -1,7 +1,6 @@
 package NC.noChance.detection.movement;
 
 import NC.noChance.core.*;
-import NC.noChance.core.VersionAdapter;
 import org.bukkit.entity.Player;
 
 import java.util.*;

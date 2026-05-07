@@ -76,9 +76,21 @@ public class PhysicsValidator {
         }
 
         double moveDist = dist(ax - st.lastX, ay - st.lastY, az - st.lastZ);
+        long sinceLast = now - st.lastUpdate;
+        boolean teleportLike = sinceLast > 1500
+                || player.isInsideVehicle() || player.isGliding() || player.isRiptiding()
+                || data.isInTeleportGracePeriod(40)
+                || data.hasRecentEnderPearl(4000)
+                || data.hasRecentChorusFruit(4000)
+                || (now - data.getLastDamageTime()) < 1500;
         if (moveDist > 4.0) {
+            if (teleportLike || moveDist > 12.0) {
+                softReset(st, ax, ay, az, now);
+                return CheckResult.passed();
+            }
             softReset(st, ax, ay, az, now);
-            return CheckResult.passed();
+            return CheckResult.failed(ViolationType.NOCLIP, 0.78,
+                    String.format("Blink: %.2f blocks in %dms", moveDist, sinceLast));
         }
 
         double[] pred = predictNext(player, st, from);

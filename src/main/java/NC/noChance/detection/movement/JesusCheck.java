@@ -4,7 +4,6 @@ import NC.noChance.core.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
@@ -26,7 +25,6 @@ public class JesusCheck {
     private static final int REQUIRED_VL = 4;
     private static final int INSTANT_FLAG_VL = 10;
     private static final double WATER_SURFACE_TOLERANCE = 0.25;
-    private static final double SINK_RATE_THRESHOLD = -0.03;
     private static final long EXEMPT_GRACE_MS = 600;
     private static final double MIN_HORIZONTAL_SPEED = 0.08;
     private static final double BOB_VELOCITY_THRESHOLD = 0.06;

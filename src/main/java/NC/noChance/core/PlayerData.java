@@ -44,8 +44,8 @@ public class PlayerData {
     private volatile long lastBlockBreakTime;
     private Location lastBlockBreak;
     private volatile long blockBreakStartTime;
-    private String blockBreakInitialTool;
-    private int blockBreakInitialEfficiency;
+    private volatile String blockBreakInitialTool;
+    private volatile int blockBreakInitialEfficiency;
     private final BoundedDeque<Long> blockBreakIntervals;
     private volatile int consecutiveFastBreaks;
 
@@ -59,8 +59,8 @@ public class PlayerData {
     private volatile double averageCPS;
     private volatile double averageRotationSpeed;
     private volatile double averageAccuracy;
-    private int totalHits;
-    private int totalAttempts;
+    private volatile int totalHits;
+    private volatile int totalAttempts;
 
     private SkillLevel skillLevel;
     private long sessionStartTime;
@@ -73,23 +73,23 @@ public class PlayerData {
     private final AtomicInteger totalCheckCount = new AtomicInteger(0);
     private volatile long lastViolationTime;
 
-    private int historicalViolationCount;
-    private long lastKickTime;
-    private int effectiveGracePeriod;
-    private boolean strictDetectionMode;
+    private volatile int historicalViolationCount;
+    private volatile long lastKickTime;
+    private volatile int effectiveGracePeriod;
+    private volatile boolean strictDetectionMode;
     private volatile long lastTeleportTime;
     private final AtomicInteger groundTicks = new AtomicInteger(0);
     private volatile long lastWaterTime;
     private volatile long lastDamageTime;
 
-    private boolean bedrockPlayer;
-    private int clientVersion;
+    private volatile boolean bedrockPlayer;
+    private volatile int clientVersion;
     private volatile double viaTolerance;
-    private int ping;
+    private volatile int ping;
     private final BoundedDeque<Integer> pingHistory;
-    private double averagePing;
-    private boolean frozen;
-    private long frozenTime;
+    private volatile double averagePing;
+    private volatile boolean frozen;
+    private volatile long frozenTime;
     private volatile boolean gliding;
     private volatile double[] lastPredictedPos;
 
@@ -252,7 +252,7 @@ public class PlayerData {
         }
     }
 
-    public void updateAccuracy(boolean hit) {
+    public synchronized void updateAccuracy(boolean hit) {
         totalAttempts++;
         if (hit) totalHits++;
         averageAccuracy = totalAttempts > 0 ? (double) totalHits / totalAttempts : 0.0;
@@ -640,6 +640,10 @@ public class PlayerData {
 
     public void setLastChorusFruitTime(long time) {
         this.lastChorusFruitTime = time;
+    }
+
+    public boolean hasRecentChorusFruit(long windowMs) {
+        return lastChorusFruitTime > 0 && (System.currentTimeMillis() - lastChorusFruitTime) < windowMs;
     }
 
     public Deque<VelocityData> getVelocityHistory() {

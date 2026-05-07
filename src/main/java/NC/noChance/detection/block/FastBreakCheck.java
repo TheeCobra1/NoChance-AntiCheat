@@ -1,7 +1,6 @@
 package NC.noChance.detection.block;
 
 import NC.noChance.core.*;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;

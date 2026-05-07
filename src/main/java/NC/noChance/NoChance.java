@@ -273,11 +273,15 @@ public final class NoChance extends JavaPlugin {
             }
         }, 1L, 1L));
 
-        lifecycleRegistry.registerBukkitTask(Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
-            Set<UUID> online = Bukkit.getOnlinePlayers().stream()
-                .map(p -> p.getUniqueId())
-                .collect(java.util.stream.Collectors.toSet());
-            playerDataMap.keySet().removeIf(uuid -> !online.contains(uuid));
+        final PlayerListener playerListenerRef = playerListener;
+        lifecycleRegistry.registerBukkitTask(Bukkit.getScheduler().runTaskTimer(this, () -> {
+            Set<UUID> online = new java.util.HashSet<>();
+            for (Player p : Bukkit.getOnlinePlayers()) online.add(p.getUniqueId());
+            List<UUID> stale = new ArrayList<>();
+            for (UUID uuid : playerDataMap.keySet()) {
+                if (!online.contains(uuid)) stale.add(uuid);
+            }
+            for (UUID uuid : stale) playerListenerRef.cleanupPlayer(uuid);
         }, 6000L, 6000L));
 
         stateSweeper = new StateSweeper(this);
@@ -378,6 +382,7 @@ public final class NoChance extends JavaPlugin {
         }
 
         BlockCache.clear();
+        NC.noChance.replay.FakePlayer.clearSkinCache();
 
         if (playerDataMap != null) {
             playerDataMap.clear();

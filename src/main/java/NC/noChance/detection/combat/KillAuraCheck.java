@@ -1,9 +1,6 @@
 package NC.noChance.detection.combat;
 
 import NC.noChance.core.*;
-import NC.noChance.core.PrecisionReach;
-import NC.noChance.core.ViaHelper;
-import NC.noChance.core.VersionAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
