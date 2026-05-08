@@ -13,7 +13,6 @@ import java.util.logging.Level;
 public class ACConfig {
     private FileConfiguration config;
     private final Plugin plugin;
-    private volatile boolean dirty;
 
     public ACConfig(Plugin plugin) {
         this.plugin = plugin;
@@ -336,6 +335,18 @@ public class ACConfig {
         return config.getStringList(key);
     }
 
+    public boolean isExternalPunishEnabled() {
+        return config.getBoolean("actions.external.enabled", false);
+    }
+
+    public String getExternalCommand(String action) {
+        return config.getString("actions.external." + action.toLowerCase(), "");
+    }
+
+    public String getExternalMessage(String action) {
+        return config.getString("actions.external.messages." + action.toLowerCase(), "");
+    }
+
     public String getLanguage() {
         return config.getString("language", "en");
     }
@@ -565,14 +576,7 @@ public class ACConfig {
             mergeMissingDefaults();
         }
         validateConfig();
-        this.dirty = true;
         plugin.getLogger().info("Configuration reloaded successfully!");
-    }
-
-    public boolean consumeDirty() {
-        if (!dirty) return false;
-        dirty = false;
-        return true;
     }
 
     public boolean isReplayEnabled() {

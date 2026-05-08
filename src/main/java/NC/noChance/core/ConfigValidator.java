@@ -27,7 +27,8 @@ public class ConfigValidator {
             "fly", "speed", "noclip", "jesus", "fastbreak", "fastplace", "nuker",
             "killaura", "nofall", "autoclicker", "reach", "inventory", "scaffold",
             "timer", "velocity", "criticals", "phase", "step", "blink", "noslow",
-            "groundspoof", "elytrafly", "strider", "boatfly"
+            "groundspoof", "elytrafly", "strider", "boatfly",
+            "aimassist", "interact", "protocol"
     );
 
     private static final List<String> KNOWN_TOP_LEVEL_KEYS = Arrays.asList(
@@ -276,7 +277,6 @@ public class ConfigValidator {
         r.add(Rule.bool("actions.kick_on_high_confidence"));
         r.add(Rule.bool("actions.warn_on_high_confidence"));
         r.add(Rule.bool("actions.warn_on_medium_confidence"));
-        r.add(Rule.bool("actions.log_low_confidence"));
         r.add(Rule.bool("actions.setback.enabled"));
         r.add(Rule.list("actions.setback.types"));
         r.add(Rule.bool("actions.custom_commands.enabled"));
@@ -284,6 +284,13 @@ public class ConfigValidator {
         r.add(Rule.list("actions.custom_commands.on_medium"));
         r.add(Rule.list("actions.custom_commands.on_high"));
         r.add(Rule.list("actions.custom_commands.on_extreme"));
+        r.add(Rule.bool("actions.external.enabled"));
+        r.add(Rule.str("actions.external.ban"));
+        r.add(Rule.str("actions.external.tempban"));
+        r.add(Rule.str("actions.external.kick"));
+        r.add(Rule.str("actions.external.messages.ban"));
+        r.add(Rule.str("actions.external.messages.tempban"));
+        r.add(Rule.str("actions.external.messages.kick"));
 
         r.add(Rule.dblRange("statistical.std_dev_multiplier", 0.01, 100.0));
         r.add(Rule.intRange("statistical.outlier_forgiveness", 0, 1000));

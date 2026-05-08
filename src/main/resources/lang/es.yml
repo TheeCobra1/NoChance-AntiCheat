@@ -477,6 +477,7 @@ punishment:
   broadcast_kick: "&6[NoChance] &e{player} &7fue &cexpulsado &7por &e{type}"
   broadcast_tempban: "&6[NoChance] &e{player} &7fue &ctempbaneado &7({duration}) por &e{type}"
   broadcast_ban: "&6[NoChance] &e{player} &7fue &4&lBANEADO PERMANENTE &7por &e{type}"
+  broadcast_detect_only: "&6[NoChance] &e{player} &7(op/bypass) detectado &e{type} &7- no sancionado"
   kick_format: "&c[NoChance] {reason}\n&7Tipo: {type}\n&7Confianza: {confidence}"
   kick_tempban_suffix: "\n\n&7Baneado por: &e{duration}"
   kick_ban_suffix: "\n\n&c&lBANEADO PERMANENTE"

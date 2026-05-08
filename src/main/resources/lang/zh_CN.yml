@@ -477,6 +477,7 @@ punishment:
   broadcast_kick: "&6[NoChance] &e{player} &7因 &e{type} &7被 &c踢出"
   broadcast_tempban: "&6[NoChance] &e{player} &7因 &e{type} &7被 &c临时封禁 &7({duration})"
   broadcast_ban: "&6[NoChance] &e{player} &7因 &e{type} &7被 &4&l永久封禁"
+  broadcast_detect_only: "&6[NoChance] &e{player} &7(op/bypass) 触发 &e{type} &7- 未处罚"
   kick_format: "&c[NoChance] {reason}\n&7类型: {type}\n&7置信: {confidence}"
   kick_tempban_suffix: "\n\n&7封禁时长: &e{duration}"
   kick_ban_suffix: "\n\n&c&l永久封禁"

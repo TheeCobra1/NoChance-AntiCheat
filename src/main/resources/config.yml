@@ -83,7 +83,6 @@ actions:
   kick_on_high_confidence: true
   warn_on_high_confidence: true
   warn_on_medium_confidence: true
-  log_low_confidence: true
 
   # teleport flagged player back to last legit ground spot
   # only fires for movement cheats listed below
@@ -99,6 +98,22 @@ actions:
     on_medium: []
     on_high: []
     on_extreme: []
+
+  # delegate kick/tempban/ban to another plugin's command
+  # use this for network-wide bans (LiteBans, AdvancedBan, LibertyBans, BungeeAB, etc.)
+  # leave a command blank to fall back to vanilla bukkit behavior for that action
+  # placeholders: %player% %type% %confidence% %reason% %message% %duration% %duration_seconds%
+  external:
+    enabled: false
+    ban: "litebans:ban -s %player% %message%"
+    tempban: "litebans:tempban -s %player% %duration% %message%"
+    kick: ""
+    # pre-set messages used as %message% in the commands above
+    # if blank, %message% falls back to the internal reason text
+    messages:
+      ban: "&cYou were banned by NoChance for %type%"
+      tempban: "&cYou were banned for %duration% by NoChance for %type%"
+      kick: "&cYou were kicked by NoChance for %type%"
 
 # stats nerds can tweak these
 statistical:
@@ -387,6 +402,24 @@ checks:
   # experimental physics-divergence flag for fly/speed
   physics_validator:
     enabled: false
+
+  # detects aim-assist/aim-snap on hit
+  aimassist:
+    enabled: true
+    threshold: 3
+    severity_multiplier: 2.5
+
+  # use-item / interact packet sanity
+  interact:
+    enabled: true
+    threshold: 3
+    severity_multiplier: 2.0
+
+  # protocol-level packet checks
+  protocol:
+    enabled: true
+    threshold: 2
+    severity_multiplier: 2.5
 
 # where to store data
 database:

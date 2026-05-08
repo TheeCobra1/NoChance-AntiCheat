@@ -477,6 +477,7 @@ punishment:
   broadcast_kick: "&6[NoChance] &e{player} &7был &cкикнут &7за &e{type}"
   broadcast_tempban: "&6[NoChance] &e{player} &7получил &cвременный бан &7({duration}) за &e{type}"
   broadcast_ban: "&6[NoChance] &e{player} &7был &4&lЗАБАНЕН НАВСЕГДА &7за &e{type}"
+  broadcast_detect_only: "&6[NoChance] &e{player} &7(op/bypass) обнаружен &e{type} &7- не наказан"
   kick_format: "&c[NoChance] {reason}\n&7Тип: {type}\n&7Уверенность: {confidence}"
   kick_tempban_suffix: "\n\n&7Бан на: &e{duration}"
   kick_ban_suffix: "\n\n&c&lПОСТОЯННЫЙ БАН"

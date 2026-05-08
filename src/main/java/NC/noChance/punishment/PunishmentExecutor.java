@@ -159,35 +159,41 @@ public class PunishmentExecutor {
                     break;
 
                 case KICK:
-                    player.kickPlayer(reason);
+                    if (!dispatchExternal("kick", player, type, confidenceLevel, reasonText, null, 0L)) {
+                        player.kickPlayer(reason);
+                    }
                     broadcastStaff("punishment.broadcast_kick", player.getName(), type.name());
                     notifyDiscord(player.getName(), type, "KICK", null, reasonText, confidenceLevel);
                     break;
 
                 case TEMPBAN:
                     String duration = formatDuration(result.duration);
-                    Date expirationDate = new Date(System.currentTimeMillis() + result.duration);
-                    String tempbanSuffix = msg(player, "punishment.kick_tempban_suffix", "duration", duration);
-                    Bukkit.getBanList(BanList.Type.NAME).addBan(
-                            player.getName(),
-                            reason + tempbanSuffix,
-                            expirationDate,
-                            "NoChance"
-                    );
-                    player.kickPlayer(reason + tempbanSuffix);
+                    if (!dispatchExternal("tempban", player, type, confidenceLevel, reasonText, duration, result.duration)) {
+                        Date expirationDate = new Date(System.currentTimeMillis() + result.duration);
+                        String tempbanSuffix = msg(player, "punishment.kick_tempban_suffix", "duration", duration);
+                        Bukkit.getBanList(BanList.Type.NAME).addBan(
+                                player.getName(),
+                                reason + tempbanSuffix,
+                                expirationDate,
+                                "NoChance"
+                        );
+                        player.kickPlayer(reason + tempbanSuffix);
+                    }
                     broadcastStaffTempban(player.getName(), type.name(), duration);
                     notifyDiscord(player.getName(), type, "TEMPBAN", duration, reasonText, confidenceLevel);
                     break;
 
                 case BAN:
-                    Bukkit.getBanList(BanList.Type.NAME).addBan(
-                            player.getName(),
-                            reason,
-                            (Date) null,
-                            "NoChance"
-                    );
-                    String kickBan = reason + msg(player, "punishment.kick_ban_suffix");
-                    player.kickPlayer(kickBan);
+                    if (!dispatchExternal("ban", player, type, confidenceLevel, reasonText, null, 0L)) {
+                        Bukkit.getBanList(BanList.Type.NAME).addBan(
+                                player.getName(),
+                                reason,
+                                (Date) null,
+                                "NoChance"
+                        );
+                        String kickBan = reason + msg(player, "punishment.kick_ban_suffix");
+                        player.kickPlayer(kickBan);
+                    }
                     broadcastStaff("punishment.broadcast_ban", player.getName(), type.name());
                     notifyDiscord(player.getName(), type, "BAN", "Permanent", reasonText, confidenceLevel);
                     break;
@@ -196,6 +202,39 @@ public class PunishmentExecutor {
                     break;
             }
         });
+    }
+
+    private boolean dispatchExternal(String action, Player player, ViolationType type,
+                                     String confidenceLevel, String reasonText,
+                                     String duration, long durationMs) {
+        if (!config.isExternalPunishEnabled()) return false;
+        String template = config.getExternalCommand(action);
+        if (template == null || template.isEmpty()) return false;
+
+        String preset = config.getExternalMessage(action);
+        String msgText = (preset == null || preset.isEmpty()) ? reasonText : preset;
+
+        String cmd = applyPlaceholders(template, player.getName(), type, confidenceLevel,
+                msgText, duration, durationMs);
+        if (cmd.startsWith("/")) cmd = cmd.substring(1);
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+        return true;
+    }
+
+    private String applyPlaceholders(String raw, String name, ViolationType type,
+                                     String confidenceLevel, String reasonText,
+                                     String duration, long durationMs) {
+        long durSec = durationMs / 1000L;
+        String dur = duration == null ? "" : duration;
+        String text = reasonText == null ? "" : reasonText;
+        return raw
+                .replace("%message%", text)
+                .replace("%reason%", text)
+                .replace("%player%", name)
+                .replace("%type%", type.name())
+                .replace("%confidence%", confidenceLevel)
+                .replace("%duration%", dur)
+                .replace("%duration_seconds%", String.valueOf(durSec));
     }
 
     public void broadcastDetectOnly(String playerName, String typeName) {
