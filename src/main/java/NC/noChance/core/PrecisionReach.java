@@ -73,7 +73,7 @@ public class PrecisionReach {
         Vector lookDirection = eyeLocation.getDirection().normalize();
 
         BoundingBox targetBox = target.getBoundingBox();
-        BoundingBox expandedBox = expandBoxForLatency(targetBox, ping);
+        BoundingBox expandedBox = expandBoxForLatency(targetBox, ping, target.getVelocity());
 
         Vector closestPoint = getClosestPointOnBox(eyePos, targetBox);
         Vector closestExpanded = getClosestPointOnBox(eyePos, expandedBox);
@@ -134,8 +134,23 @@ public class PrecisionReach {
     }
 
     private static BoundingBox expandBoxForLatency(BoundingBox box, int ping) {
-        double expansion = Math.min(0.5, ping * 0.0012);
-        return box.clone().expand(expansion);
+        return expandBoxForLatency(box, ping, null);
+    }
+
+    private static BoundingBox expandBoxForLatency(BoundingBox box, int ping, Vector velocity) {
+        int p = Math.max(0, ping);
+        double oneWayTicks = p / 100.0;
+        double baseExpansion = Math.min(0.20, p * 0.0006);
+        double vx = baseExpansion, vy = baseExpansion, vz = baseExpansion;
+        if (velocity != null && velocity.lengthSquared() > 0.0025) {
+            vx = Math.min(0.6, baseExpansion + Math.abs(velocity.getX()) * oneWayTicks);
+            vy = Math.min(0.6, baseExpansion + Math.abs(velocity.getY()) * oneWayTicks);
+            vz = Math.min(0.6, baseExpansion + Math.abs(velocity.getZ()) * oneWayTicks);
+        }
+        return new BoundingBox(
+                box.getMinX() - vx, box.getMinY() - vy, box.getMinZ() - vz,
+                box.getMaxX() + vx, box.getMaxY() + vy, box.getMaxZ() + vz
+        );
     }
 
     public static ReachResult checkBlockReach(Player player, Location blockLocation, int ping) {
