@@ -608,7 +608,7 @@ public class ACConfig {
     }
 
     public boolean isBedrockExempt() {
-        return config.getBoolean("bedrock.exempt", false);
+        return config.getBoolean("bedrock.exempt", true);
     }
 
     public boolean isBedrockRelaxed() {

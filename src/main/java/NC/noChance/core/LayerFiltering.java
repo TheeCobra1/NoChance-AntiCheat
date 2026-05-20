@@ -28,6 +28,10 @@ public class LayerFiltering {
     public boolean passesLayer2HeuristicFiltering(Player player, ViolationType type, CheckResult preliminaryResult) {
         if (!preliminaryResult.isFailed()) return true;
 
+        if (config.isBedrockExempt() && BedrockHelper.isBedrockPlayer(player)) {
+            return false;
+        }
+
         switch (type) {
             case FLY:
                 return !isLegitimateFlightScenario(player);
@@ -391,7 +395,7 @@ public class LayerFiltering {
 
         double total = pingFactor + jitterFactor + tpsFactor + baseTolerance + versionTolerance;
 
-        if (BedrockHelper.isBedrockPlayer(player) && config.isBedrockRelaxed()) {
+        if (!config.isBedrockExempt() && BedrockHelper.isBedrockPlayer(player) && config.isBedrockRelaxed()) {
             total *= Math.min(1.3, config.getBedrockToleranceMultiplier());
         }
 

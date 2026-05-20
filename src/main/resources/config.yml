@@ -479,11 +479,12 @@ replay:
 
 # bedrock edition players (geyser/floodgate)
 bedrock:
-  # don't skip checks entirely, just adjust
-  exempt: false
-  # use looser thresholds for bedrock
+  # fully exempt bedrock players — recommended, bedrock physics drift is too
+  # unbounded for tolerance widening to be safe. set false to fall back to relaxed mode
+  exempt: true
+  # legacy fallback when exempt=false: looser thresholds instead of full exempt
   relaxed_checks: true
-  # 30% more tolerance for bedrock quirks (capped at 1.3 to prevent fly/speed/killaura false negatives)
+  # legacy tolerance multiplier (capped 1.3) — only used when exempt=false
   tolerance_multiplier: 1.3
 
 # adjust for high ping players
