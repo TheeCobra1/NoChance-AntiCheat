@@ -28,6 +28,10 @@ public class ScaffoldCheck {
     private static final long HEADCRANE_WINDOW_MS = 10_000L;
     private static final int HEADCRANE_MIN_HITS = 3;
 
+    private static final double GODBRIDGE_PITCH_CENTER = 75.65;
+    private static final double GODBRIDGE_PITCH_BAND = 1.2;
+    private static final int GODBRIDGE_MIN_PLACEMENTS = 3;
+
     public ScaffoldCheck(ACConfig config, Map<UUID, PlayerData> playerDataMap, LayerFiltering filtering) {
         this.config = config;
         this.playerDataMap = playerDataMap;
@@ -83,6 +87,11 @@ public class ScaffoldCheck {
             placements.add(new BlockPlaceRecord(blockLoc, now, pitch));
             placements.removeIf(record -> now - record.timestamp > 3000);
             snapshot = new ArrayList<>(placements);
+        }
+
+        CheckResult godBridgeResult = checkGodBridgePitch(player, snapshot);
+        if (godBridgeResult.isFailed()) {
+            return godBridgeResult;
         }
 
         if (BlockCache.isType(blockLoc, org.bukkit.Material.SCAFFOLDING)) {
@@ -479,6 +488,43 @@ public class ScaffoldCheck {
         );
 
         if (!filtering.passesLayer2HeuristicFiltering(player, ViolationType.SCAFFOLD, prelim)) {
+            return CheckResult.passed();
+        }
+        return prelim;
+    }
+
+    private CheckResult checkGodBridgePitch(Player player, List<BlockPlaceRecord> snapshot) {
+        if (snapshot == null || snapshot.size() < GODBRIDGE_MIN_PLACEMENTS) return CheckResult.passed();
+
+        int hits = 0;
+        double pitchSum = 0;
+        double pitchMin = Double.POSITIVE_INFINITY;
+        double pitchMax = Double.NEGATIVE_INFINITY;
+        for (BlockPlaceRecord rec : snapshot) {
+            if (Math.abs(rec.pitch - GODBRIDGE_PITCH_CENTER) <= GODBRIDGE_PITCH_BAND) {
+                hits++;
+                pitchSum += rec.pitch;
+                if (rec.pitch < pitchMin) pitchMin = rec.pitch;
+                if (rec.pitch > pitchMax) pitchMax = rec.pitch;
+            }
+        }
+
+        if (hits < GODBRIDGE_MIN_PLACEMENTS) return CheckResult.passed();
+
+        double spread = pitchMax - pitchMin;
+        double avg = pitchSum / hits;
+        double severity = 0.78;
+        if (spread < 0.5) severity += 0.10;
+        if (hits >= 5) severity += 0.07;
+        severity = Math.max(0.6, Math.min(0.98, severity));
+
+        CheckResult prelim = CheckResult.failed(
+                ViolationType.SCAFFOLD_BRIDGE,
+                severity,
+                String.format("SCAFFOLD_GODBRIDGE pitch:%.2f spread:%.2f hits:%d", avg, spread, hits)
+        );
+
+        if (!filtering.passesLayer2HeuristicFiltering(player, ViolationType.SCAFFOLD_BRIDGE, prelim)) {
             return CheckResult.passed();
         }
         return prelim;
