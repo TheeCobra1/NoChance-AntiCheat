@@ -22,6 +22,7 @@ public class PacketAnalyzer {
     private final ACConfig config;
     private final BlinkCheck blinkCheck;
     private PacketFingerprint packetFingerprint;
+    private TransactionTracker transactionTracker;
     private PacketListenerAbstract registeredListener;
 
     public PacketAnalyzer(Plugin plugin, ACConfig config, BlinkCheck blinkCheck) {
@@ -38,6 +39,10 @@ public class PacketAnalyzer {
 
     public void setPacketFingerprint(PacketFingerprint packetFingerprint) {
         this.packetFingerprint = packetFingerprint;
+    }
+
+    public void setTransactionTracker(TransactionTracker transactionTracker) {
+        this.transactionTracker = transactionTracker;
     }
 
     public void shutdown() {
@@ -74,6 +79,14 @@ public class PacketAnalyzer {
 
                     if (packetFingerprint != null) {
                         packetFingerprint.record(player.getUniqueId(), packetType, timestamp);
+                    }
+
+                    if (transactionTracker != null && event.getPacketType() == PacketType.Play.Client.PONG) {
+                        try {
+                            WrapperPlayClientPong pong = new WrapperPlayClientPong(event);
+                            transactionTracker.onPong(player, pong.getId());
+                        } catch (Throwable ignored) {
+                        }
                     }
 
                     if (event.getPacketType() == PacketType.Play.Client.PLAYER_POSITION ||

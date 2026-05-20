@@ -45,6 +45,7 @@ public final class NoChance extends JavaPlugin {
     private LayerFiltering layerFiltering;
     private MultiLayerValidator multiLayerValidator;
     private PacketAnalyzer packetAnalyzer;
+    private TransactionTracker transactionTracker;
     private DetectionEngine detectionEngine;
     private UpdateChecker updateChecker;
     private CheckRegistry checkRegistry;
@@ -167,6 +168,10 @@ public final class NoChance extends JavaPlugin {
         packetAnalyzer.setPacketFingerprint(packetFingerprint);
         multiLayerValidator.setPacketAnalyzer(packetAnalyzer);
 
+        transactionTracker = new TransactionTracker(this);
+        packetAnalyzer.setTransactionTracker(transactionTracker);
+        transactionTracker.start();
+
         predictionEngine = new PredictionEngine();
         multiLayerValidator.setPredictionEngine(predictionEngine);
 
@@ -194,6 +199,7 @@ public final class NoChance extends JavaPlugin {
         playerListener.setSimBridge(simBridge);
         playerListener.setSessionTracker(sessionTracker);
         playerListener.setPacketFingerprint(packetFingerprint);
+        playerListener.setTransactionTracker(transactionTracker);
         playerListener.setMovementGrace(movementGrace);
         multiLayerValidator.setSimEngine(simEngine);
         playerListener.registerOnce(this);
@@ -384,6 +390,10 @@ public final class NoChance extends JavaPlugin {
         BlockCache.clear();
         NC.noChance.replay.FakePlayer.clearSkinCache();
 
+        if (transactionTracker != null) {
+            transactionTracker.shutdown();
+        }
+
         if (playerDataMap != null) {
             playerDataMap.clear();
         }
@@ -457,6 +467,10 @@ public final class NoChance extends JavaPlugin {
 
     public PacketFingerprint getPacketFingerprint() {
         return packetFingerprint;
+    }
+
+    public TransactionTracker getTransactionTracker() {
+        return transactionTracker;
     }
 
     public LiveOverlay getLiveOverlay() {

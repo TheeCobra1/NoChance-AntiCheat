@@ -57,6 +57,7 @@ public class PlayerListener implements Listener {
     private SimBridge simBridge;
     private SessionTracker sessionTracker;
     private PacketFingerprint packetFingerprint;
+    private TransactionTracker transactionTracker;
     private MovementGrace movementGrace;
 
     private final Map<UUID, Long> lastShiftAlert = new ConcurrentHashMap<>();
@@ -101,6 +102,10 @@ public class PlayerListener implements Listener {
 
     public void setPacketFingerprint(PacketFingerprint packetFingerprint) {
         this.packetFingerprint = packetFingerprint;
+    }
+
+    public void setTransactionTracker(TransactionTracker transactionTracker) {
+        this.transactionTracker = transactionTracker;
     }
 
     public void setMovementGrace(MovementGrace movementGrace) {
@@ -275,6 +280,10 @@ public class PlayerListener implements Listener {
             packetFingerprint.cleanup(player.getUniqueId());
         }
 
+        if (transactionTracker != null) {
+            transactionTracker.onPlayerQuit(player.getUniqueId());
+        }
+
         if (simBridge != null) {
             simBridge.cleanup(player.getUniqueId());
         }
@@ -316,6 +325,10 @@ public class PlayerListener implements Listener {
 
         if (packetFingerprint != null) {
             packetFingerprint.cleanup(player.getUniqueId());
+        }
+
+        if (transactionTracker != null) {
+            transactionTracker.onPlayerQuit(player.getUniqueId());
         }
 
         if (simBridge != null) {
