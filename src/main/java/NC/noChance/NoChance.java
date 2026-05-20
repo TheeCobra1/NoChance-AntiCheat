@@ -170,6 +170,9 @@ public final class NoChance extends JavaPlugin {
 
         transactionTracker = new TransactionTracker(this);
         packetAnalyzer.setTransactionTracker(transactionTracker);
+        if (layerFiltering != null) {
+            layerFiltering.setTransactionTracker(transactionTracker);
+        }
         transactionTracker.start();
 
         predictionEngine = new PredictionEngine();

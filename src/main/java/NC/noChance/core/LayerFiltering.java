@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 public class LayerFiltering {
     private final ACConfig config;
     private final Map<UUID, PingHistory> pingHistoryMap;
+    private TransactionTracker transactionTracker;
     private static final double EWMA_ALPHA = 0.25;
     private static final double SIGMOID_STEEPNESS = 0.012;
     private static final double ENTROPY_THRESHOLD = 2.2;
@@ -23,6 +24,10 @@ public class LayerFiltering {
     public LayerFiltering(ACConfig config) {
         this.config = config;
         this.pingHistoryMap = new ConcurrentHashMap<>();
+    }
+
+    public void setTransactionTracker(TransactionTracker transactionTracker) {
+        this.transactionTracker = transactionTracker;
     }
 
     public boolean passesLayer2HeuristicFiltering(Player player, ViolationType type, CheckResult preliminaryResult) {
@@ -418,6 +423,12 @@ public class LayerFiltering {
     }
 
     public int getPing(Player player) {
+        if (transactionTracker != null && transactionTracker.hasFreshData(player)) {
+            long rttMs = transactionTracker.getRoundTripMillis(player);
+            if (rttMs >= 0 && rttMs < 2000) {
+                return (int) rttMs;
+            }
+        }
         return Math.max(0, player.getPing());
     }
 
