@@ -1,6 +1,8 @@
 package NC.noChance.core;
 
 import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
@@ -15,6 +17,29 @@ public class PrecisionReach {
     private static final double PING_COMPENSATION_MAX = 0.55;
     private static final int PING_THRESHOLD_LOW = 50;
     private static final int PING_THRESHOLD_HIGH = 200;
+
+    private static final Attribute ENTITY_RANGE_ATTR = resolveAttribute("PLAYER_ENTITY_INTERACTION_RANGE", "GENERIC_ATTACK_RANGE");
+    private static final Attribute BLOCK_RANGE_ATTR = resolveAttribute("PLAYER_BLOCK_INTERACTION_RANGE");
+
+    private static Attribute resolveAttribute(String... names) {
+        for (String name : names) {
+            try {
+                return Attribute.valueOf(name);
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+        return null;
+    }
+
+    private static double getLiveReach(Player player, Attribute attr, double fallback) {
+        if (attr == null || player == null) return fallback;
+        try {
+            AttributeInstance inst = player.getAttribute(attr);
+            if (inst != null) return inst.getValue();
+        } catch (Throwable ignored) {
+        }
+        return fallback;
+    }
 
     public static class ReachResult {
         public final double distance;
@@ -56,7 +81,7 @@ public class PrecisionReach {
         double distance = calculatePreciseDistance(eyePos, closestPoint);
         double distanceExpanded = calculatePreciseDistance(eyePos, closestExpanded);
 
-        double maxReach = MAX_ENTITY_REACH;
+        double maxReach = getLiveReach(player, ENTITY_RANGE_ATTR, MAX_ENTITY_REACH);
         double pingCompensation = calculatePingCompensation(ping);
         maxReach += pingCompensation;
 
@@ -135,7 +160,7 @@ public class PrecisionReach {
             distance = rayDistance;
         }
 
-        double maxReach = MAX_BLOCK_REACH;
+        double maxReach = getLiveReach(player, BLOCK_RANGE_ATTR, MAX_BLOCK_REACH);
         double pingCompensation = calculatePingCompensation(ping) * 1.2;
         maxReach += pingCompensation;
 
