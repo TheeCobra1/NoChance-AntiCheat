@@ -262,7 +262,7 @@ public class VelocityCheck {
         double deficit = 1.0 - receivedRatio;
         double pingTolerance = 0.05 + (ping * 0.00015);
 
-        if (deficit > (0.08 + pingTolerance) && receivedRatio > 0.05 && varianceH < 0.012) {
+        if (deficit > (0.08 + pingTolerance) && receivedRatio > 0.05 && varianceH < 0.015) {
             int receivedPercent = (int) Math.round(receivedRatio * 100);
             double severity = Math.min(0.94, 0.72 + deficit * 0.55);
 

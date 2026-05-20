@@ -266,7 +266,7 @@ public class ReachCheck {
         if (distance > maxReach) {
             CheckResult prelimResult = CheckResult.failed(
                     ViolationType.REACH,
-                    Math.min(1.0, (distance - maxReach) / maxReach),
+                    Math.min(1.0, (distance - maxReach) / Math.max(0.01, maxReach)),
                     String.format("Block reach: %.2f blocks (max: %.1f) | Confidence: %.2f",
                             distance, maxReach, confidence)
             );

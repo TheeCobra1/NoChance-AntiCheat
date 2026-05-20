@@ -539,11 +539,16 @@ public class FlyCheck {
 
         if (activeLevitation) {
             var eff = player.getPotionEffect(levType);
-            int amplifier = eff.getAmplifier();
-            int durationTicks = eff.getDuration();
-            double scale = durationTicks < 20 ? (durationTicks / 20.0) : 1.0;
-            double levTarget = 0.05 * (amplifier + 1) * scale;
-            predicted = (lastVelocity + (levTarget - lastVelocity) * 0.2) * DRAG;
+            if (eff != null) {
+                int amplifier = eff.getAmplifier();
+                int durationTicks = eff.getDuration();
+                double scale = durationTicks < 20 ? (durationTicks / 20.0) : 1.0;
+                double levTarget = 0.05 * (amplifier + 1) * scale;
+                predicted = (lastVelocity + (levTarget - lastVelocity) * 0.2) * DRAG;
+            } else {
+                predicted = (lastVelocity - GRAVITY) * DRAG;
+                activeLevitation = false;
+            }
         } else {
             predicted = (lastVelocity - GRAVITY) * DRAG;
             if (data.hadRecentLevitation(1500)) {

@@ -135,7 +135,7 @@ public class NukerCheck {
         boolean multiDir = hasMultiDirectionBreaks(player, breaks);
         if (simultaneousBreaks >= simThreshold && (multiDir || simultaneousBreaks >= simThreshold + 3)) {
             String toolInfo = getToolInfo(player);
-            double bps = breaks.size() / 0.8;
+            double bps = breaks.size() / 1.2;
             String pattern = analyzeBreakPattern(breaks);
 
             CheckResult prelimResult = CheckResult.failed(

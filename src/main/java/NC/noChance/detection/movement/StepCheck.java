@@ -128,9 +128,12 @@ public class StepCheck {
         double maxStep = 0.6;
 
         if (player.hasPotionEffect(PotionEffectType.JUMP_BOOST)) {
-            int level = player.getPotionEffect(PotionEffectType.JUMP_BOOST).getAmplifier() + 1;
-            int capped = Math.min(5, level);
-            maxStep += Math.min(0.8, capped * 0.4);
+            var jb = player.getPotionEffect(PotionEffectType.JUMP_BOOST);
+            if (jb != null) {
+                int level = jb.getAmplifier() + 1;
+                int capped = Math.min(5, level);
+                maxStep += Math.min(0.8, capped * 0.4);
+            }
         }
 
         if (player.hasPotionEffect(PotionEffectType.LEVITATION)) {

@@ -188,8 +188,11 @@ public class GroundSpoofCheck {
         if (pingTolerance > 0.6) pingTolerance = 0.6;
         double jumpBoostTolerance = 0.0;
         if (player.hasPotionEffect(PotionEffectType.JUMP_BOOST) && player.getFallDistance() == 0.0f) {
-            int level = player.getPotionEffect(PotionEffectType.JUMP_BOOST).getAmplifier() + 1;
-            jumpBoostTolerance = Math.min(1.0, level * 0.3);
+            var jb = player.getPotionEffect(PotionEffectType.JUMP_BOOST);
+            if (jb != null) {
+                int level = jb.getAmplifier() + 1;
+                jumpBoostTolerance = Math.min(1.0, level * 0.3);
+            }
         }
         double adjustedBaseThreshold = BASE_DISTANCE_THRESHOLD + pingTolerance + jumpBoostTolerance;
         double adjustedNoFallThreshold = NOFALL_DISTANCE_THRESHOLD + pingTolerance + jumpBoostTolerance;
