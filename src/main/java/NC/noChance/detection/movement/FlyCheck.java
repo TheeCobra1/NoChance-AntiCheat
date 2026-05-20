@@ -532,24 +532,32 @@ public class FlyCheck {
             return Math.min(actualVelocity, 0.8);
         }
 
-        double predicted = (lastVelocity - GRAVITY) * DRAG;
-
-        PotionEffectType slowFallType = PotionEffectType.getByName("SLOW_FALLING");
-        if (slowFallType != null && player.hasPotionEffect(slowFallType)) {
-            predicted = Math.max(predicted, -0.01);
-        } else if (data.hadRecentSlowFalling(1500)) {
-            predicted = Math.max(predicted, -0.01);
-        }
+        double predicted;
 
         PotionEffectType levType = PotionEffectType.getByName("LEVITATION");
-        if (levType != null && player.hasPotionEffect(levType)) {
+        boolean activeLevitation = levType != null && player.hasPotionEffect(levType);
+
+        if (activeLevitation) {
             var eff = player.getPotionEffect(levType);
             int amplifier = eff.getAmplifier();
             int durationTicks = eff.getDuration();
             double scale = durationTicks < 20 ? (durationTicks / 20.0) : 1.0;
-            predicted += 0.05 * (amplifier + 1) * scale;
-        } else if (data.hadRecentLevitation(1500)) {
-            predicted += 0.04;
+            double levTarget = 0.05 * (amplifier + 1) * scale;
+            predicted = (lastVelocity + (levTarget - lastVelocity) * 0.2) * DRAG;
+        } else {
+            predicted = (lastVelocity - GRAVITY) * DRAG;
+            if (data.hadRecentLevitation(1500)) {
+                predicted += 0.04;
+            }
+        }
+
+        if (!activeLevitation) {
+            PotionEffectType slowFallType = PotionEffectType.getByName("SLOW_FALLING");
+            if (slowFallType != null && player.hasPotionEffect(slowFallType)) {
+                predicted = Math.max(predicted, -0.01);
+            } else if (data.hadRecentSlowFalling(1500)) {
+                predicted = Math.max(predicted, -0.01);
+            }
         }
 
         Location loc = player.getLocation();
