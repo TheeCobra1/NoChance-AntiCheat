@@ -173,6 +173,9 @@ public final class NoChance extends JavaPlugin {
         if (layerFiltering != null) {
             layerFiltering.setTransactionTracker(transactionTracker);
         }
+        if (checkRegistry != null && checkRegistry.getBlinkCheck() != null) {
+            checkRegistry.getBlinkCheck().setTransactionTracker(transactionTracker);
+        }
         transactionTracker.start();
 
         predictionEngine = new PredictionEngine();

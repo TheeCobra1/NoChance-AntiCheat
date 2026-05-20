@@ -22,6 +22,7 @@ public class BlinkCheck {
     private static final int MIN_PACKETS_FOR_ANALYSIS = 15;
 
     private MovementGrace movementGrace;
+    private TransactionTracker transactionTracker;
 
     public BlinkCheck(ACConfig config, Map<UUID, PlayerData> playerDataMap, LayerFiltering filtering) {
         this.config = config;
@@ -33,6 +34,10 @@ public class BlinkCheck {
 
     public void setMovementGrace(MovementGrace grace) {
         this.movementGrace = grace;
+    }
+
+    public void setTransactionTracker(TransactionTracker transactionTracker) {
+        this.transactionTracker = transactionTracker;
     }
 
     public void onPacketReceived(Player player, String packetType, long timestamp) {
@@ -144,6 +149,29 @@ public class BlinkCheck {
         if (isPlayerMining(player)) {
             tracker.resetViolations();
             return CheckResult.passed();
+        }
+
+        if (transactionTracker != null) {
+            int pending = transactionTracker.getPendingCount(player);
+            long lastConfirmedNanos = transactionTracker.getLastConfirmedNanos(player);
+            long confirmedCount = transactionTracker.getConfirmedCount(player);
+            if (confirmedCount >= 30 && pending >= 15 && lastConfirmedNanos > 0) {
+                long sinceLastNanos = System.nanoTime() - lastConfirmedNanos;
+                if (sinceLastNanos > 1_500_000_000L) {
+                    int recentMoves = tracker.getPacketHistory().size();
+                    if (recentMoves >= 8) {
+                        double severity = Math.min(0.97, 0.82 + (pending - 15) * 0.01 + (sinceLastNanos / 1_000_000_000.0 - 1.5) * 0.05);
+                        CheckResult stallResult = CheckResult.failed(
+                                ViolationType.BLINK,
+                                severity,
+                                String.format("BLINK_TXN_STALL pending=%d sinceLast=%.2fs moves=%d", pending, sinceLastNanos / 1_000_000_000.0, recentMoves)
+                        );
+                        if (filtering.passesLayer2HeuristicFiltering(player, ViolationType.BLINK, stallResult)) {
+                            return stallResult;
+                        }
+                    }
+                }
+            }
         }
 
         PacketBurstAnalysis analysis = analyzePacketBursts(tracker, now);
