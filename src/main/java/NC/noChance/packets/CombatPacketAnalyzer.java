@@ -64,6 +64,33 @@ public class CombatPacketAnalyzer {
                         double distance = playerLoc.distance(targetLoc);
                         data.setMetadata("lastAttackDistance", distance);
 
+                        if (distance <= 6.0) {
+                            try {
+                                Location eye = player.getEyeLocation();
+                                Vector toTarget = target.getBoundingBox().getCenter().subtract(eye.toVector());
+                                double rayLen = toTarget.length();
+                                if (rayLen > 0.5 && rayLen <= 6.0) {
+                                    org.bukkit.util.RayTraceResult rt = player.getWorld().rayTraceBlocks(
+                                            eye, toTarget.clone().normalize(), rayLen,
+                                            org.bukkit.FluidCollisionMode.NEVER, true);
+                                    if (rt != null && rt.getHitBlock() != null) {
+                                        org.bukkit.Material hitMat = rt.getHitBlock().getType();
+                                        if (hitMat.isOccluding()) {
+                                            Object streakObj = data.getMetadata("wallHitStreak");
+                                            int streak = streakObj instanceof Integer ? (Integer) streakObj : 0;
+                                            data.setMetadata("wallHitStreak", streak + 1);
+                                            data.setMetadata("lastWallHitMaterial", hitMat.name());
+                                        } else {
+                                            data.setMetadata("wallHitStreak", 0);
+                                        }
+                                    } else {
+                                        data.setMetadata("wallHitStreak", 0);
+                                    }
+                                }
+                            } catch (Throwable ignored) {
+                            }
+                        }
+
                         double dx = targetLoc.getX() - playerLoc.getX();
                         double dy = targetLoc.getY() - playerLoc.getY();
                         double dz = targetLoc.getZ() - playerLoc.getZ();
@@ -136,6 +163,17 @@ public class CombatPacketAnalyzer {
             if (streak >= 5) {
                 double severity = Math.min(0.97, 0.82 + (streak - 5) * 0.02);
                 return new PacketAnalyzer.PacketViolationResult(true, severity, "No-swing aura: " + streak + " attacks without swing");
+            }
+        }
+
+        Object wallObj = data.getMetadata("wallHitStreak");
+        if (wallObj instanceof Integer) {
+            int streak = (Integer) wallObj;
+            if (streak >= 3) {
+                Object matObj = data.getMetadata("lastWallHitMaterial");
+                String matName = matObj instanceof String ? (String) matObj : "?";
+                double severity = Math.min(0.97, 0.85 + (streak - 3) * 0.03);
+                return new PacketAnalyzer.PacketViolationResult(true, severity, "Wall-hit aura: " + streak + " through " + matName);
             }
         }
 
