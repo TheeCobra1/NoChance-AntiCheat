@@ -151,6 +151,20 @@ public class AutoClickerCheck {
             }
         }
 
+        if (intervals.size() >= 30) {
+            double uniformity = uniformityRatio(intervals);
+            if (uniformity > 0 && uniformity < 1.6 && cps > 4) {
+                CheckResult uniResult = CheckResult.failed(
+                        ViolationType.AUTOCLICKER,
+                        Math.min(0.95, 0.78 + (1.6 - uniformity) * 0.10),
+                        String.format("AC_UNIFORM_JITTER: uniformity=%.2f CPS=%.1f samples=%d", uniformity, cps, intervals.size())
+                );
+                if (filtering.passesLayer2HeuristicFiltering(player, ViolationType.AUTOCLICKER, uniResult)) {
+                    return uniResult;
+                }
+            }
+        }
+
         ClickType clickType = classifyClickType(cps, cv, entropy, recentIntervals);
         profile.recordType(clickType);
 
@@ -533,6 +547,29 @@ public class AutoClickerCheck {
         m4 /= n;
         if (m2 <= 1e-9) return 3.0;
         return m4 / (m2 * m2);
+    }
+
+    static double uniformityRatio(List<Long> intervals) {
+        int n = intervals.size();
+        if (n < 30) return -1.0;
+        long lo = Long.MAX_VALUE, hi = Long.MIN_VALUE;
+        for (long v : intervals) {
+            if (v < lo) lo = v;
+            if (v > hi) hi = v;
+        }
+        long span = hi - lo;
+        if (span < 50) return -1.0;
+        int bins = 8;
+        int[] counts = new int[bins];
+        for (long v : intervals) {
+            int idx = (int) Math.min(bins - 1, ((v - lo) * bins) / span);
+            counts[idx]++;
+        }
+        double mean = n / (double) bins;
+        double var = 0.0;
+        for (int c : counts) var += (c - mean) * (c - mean);
+        var /= bins;
+        return var / Math.max(0.5, mean);
     }
 
     private double computeCPS(List<Long> intervals) {
