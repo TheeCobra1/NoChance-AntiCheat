@@ -37,6 +37,20 @@ public class CombatPacketAnalyzer {
                     int entityId = wrapper.getEntityId();
                     data.setMetadata("lastAttackDistance", null);
                     data.setMetadata("lastAttackAngle", null);
+
+                    long attackNow = System.currentTimeMillis();
+                    Object lastSwingObj = data.getMetadata("lastSwingTime");
+                    long lastSwing = lastSwingObj instanceof Long ? (Long) lastSwingObj : 0L;
+                    long sinceSwing = lastSwing > 0 ? attackNow - lastSwing : Long.MAX_VALUE;
+                    boolean swingMissing = sinceSwing < 0 || sinceSwing > 300L;
+                    Object noSwingObj = data.getMetadata("noSwingStreak");
+                    int noSwingStreak = noSwingObj instanceof Integer ? (Integer) noSwingObj : 0;
+                    if (swingMissing) {
+                        noSwingStreak++;
+                    } else {
+                        noSwingStreak = 0;
+                    }
+                    data.setMetadata("noSwingStreak", noSwingStreak);
                     Bukkit.getScheduler().runTask(plugin, () -> {
                         if (player == null || !player.isOnline() || player.getWorld() == null) return;
 
@@ -116,6 +130,15 @@ public class CombatPacketAnalyzer {
     }
 
     private PacketAnalyzer.PacketViolationResult checkKillAuraPackets(Player player, PacketAnalyzer.PacketData data) {
+        Object noSwingObj = data.getMetadata("noSwingStreak");
+        if (noSwingObj instanceof Integer) {
+            int streak = (Integer) noSwingObj;
+            if (streak >= 5) {
+                double severity = Math.min(0.97, 0.82 + (streak - 5) * 0.02);
+                return new PacketAnalyzer.PacketViolationResult(true, severity, "No-swing aura: " + streak + " attacks without swing");
+            }
+        }
+
         Object angleObj = data.getMetadata("lastAttackAngle");
         if (angleObj != null) {
             double angle = (double) angleObj;
