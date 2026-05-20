@@ -237,7 +237,6 @@ public class VelocityCheck {
     }
 
     private CheckResult checkPercentageVelocity(VelocityTracker tracker, Player player, double hPercent, double vPercent, int ping, double kbResist) {
-        double[] commonPercentages = {0.0, 0.50, 0.75, 0.80, 0.85, 0.90, 0.95};
         double avgH = tracker.getAverageHorizontal();
         double varianceH = tracker.getHorizontalVariance();
 
@@ -245,36 +244,37 @@ public class VelocityCheck {
             return CheckResult.passed();
         }
 
-        for (double target : commonPercentages) {
-            if (target == 0.0) {
-                if (avgH < 0.08 && varianceH < 0.003 && ping < 200) {
-                    CheckResult prelimResult = CheckResult.failed(
-                        ViolationType.VELOCITY,
-                        0.96,
-                        String.format("Full anti-KB: %.1f%% (var:%.4f)", avgH * 100, varianceH)
-                    );
-                    if (filtering.passesLayer2HeuristicFiltering(player, ViolationType.VELOCITY, prelimResult)) {
-                        return prelimResult;
-                    }
-                }
-            } else if (target < 0.95) {
-                double adjustedTarget = target * (1.0 - kbResist);
-                double tolerance = 0.05 + (ping * 0.00015);
-                if (Math.abs(avgH - adjustedTarget) < tolerance && varianceH < 0.012) {
-                    int detectedPercent = (int) Math.round(target * 100);
-                    double severity = Math.min(0.94, 0.76 + (0.95 - target) * 0.5);
+        if (avgH < 0.08 && varianceH < 0.003 && ping < 200) {
+            CheckResult prelimResult = CheckResult.failed(
+                ViolationType.VELOCITY,
+                0.96,
+                String.format("Full anti-KB: %.1f%% (var:%.4f)", avgH * 100, varianceH)
+            );
+            if (filtering.passesLayer2HeuristicFiltering(player, ViolationType.VELOCITY, prelimResult)) {
+                return prelimResult;
+            }
+        }
 
-                    CheckResult prelimResult = CheckResult.failed(
-                        ViolationType.VELOCITY,
-                        severity,
-                        String.format("Velocity %d%%: actual %.1f%% (var:%.4f, samples:%d)",
-                            detectedPercent, avgH * 100, varianceH, tracker.getSampleCount())
-                    );
+        double expected = 1.0 - kbResist;
+        if (expected < 0.05) return CheckResult.passed();
 
-                    if (filtering.passesLayer2HeuristicFiltering(player, ViolationType.VELOCITY, prelimResult)) {
-                        return prelimResult;
-                    }
-                }
+        double receivedRatio = avgH / expected;
+        double deficit = 1.0 - receivedRatio;
+        double pingTolerance = 0.05 + (ping * 0.00015);
+
+        if (deficit > (0.08 + pingTolerance) && receivedRatio > 0.05 && varianceH < 0.012) {
+            int receivedPercent = (int) Math.round(receivedRatio * 100);
+            double severity = Math.min(0.94, 0.72 + deficit * 0.55);
+
+            CheckResult prelimResult = CheckResult.failed(
+                ViolationType.VELOCITY,
+                severity,
+                String.format("Velocity mitigation: received %d%% of expected (deficit %.1f%%, var:%.4f, samples:%d)",
+                    receivedPercent, deficit * 100, varianceH, tracker.getSampleCount())
+            );
+
+            if (filtering.passesLayer2HeuristicFiltering(player, ViolationType.VELOCITY, prelimResult)) {
+                return prelimResult;
             }
         }
 
