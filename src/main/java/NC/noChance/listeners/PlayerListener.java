@@ -284,6 +284,11 @@ public class PlayerListener implements Listener {
             transactionTracker.onPlayerQuit(player.getUniqueId());
         }
 
+        Improbable impCleanup = plugin.getImprobable();
+        if (impCleanup != null) {
+            impCleanup.cleanup(player.getUniqueId());
+        }
+
         if (simBridge != null) {
             simBridge.cleanup(player.getUniqueId());
         }
@@ -329,6 +334,11 @@ public class PlayerListener implements Listener {
 
         if (transactionTracker != null) {
             transactionTracker.onPlayerQuit(player.getUniqueId());
+        }
+
+        Improbable impCleanup = plugin.getImprobable();
+        if (impCleanup != null) {
+            impCleanup.cleanup(player.getUniqueId());
         }
 
         if (simBridge != null) {
@@ -786,6 +796,14 @@ public class PlayerListener implements Listener {
         if (checks.getCriticalsCheck() != null) {
             checks.getCriticalsCheck().recordMovement(player, event.getFrom(), to);
         }
+
+        Improbable imp = plugin.getImprobable();
+        if (imp != null) {
+            CheckResult impResult = imp.evaluate(player);
+            if (impResult.isFailed()) {
+                handleMultiLayerValidation(player, impResult, ViolationType.PROTOCOL);
+            }
+        }
         org.bukkit.Location lc = event.getTo();
         if (lc != null) {
             org.bukkit.World w = lc.getWorld();
@@ -1216,6 +1234,14 @@ public class PlayerListener implements Listener {
         ViolationType actualType = checkResult.getViolationType();
         if (actualType != null) {
             type = actualType;
+        }
+
+        Improbable imp = plugin.getImprobable();
+        if (imp != null && type != null) {
+            String reason = checkResult.getReason();
+            if (reason == null || !reason.startsWith("IMPROBABLE")) {
+                imp.feed(player, type, Math.min(0.6, checkResult.getSeverity() * 0.4));
+            }
         }
 
         if (predictionEngine != null) {

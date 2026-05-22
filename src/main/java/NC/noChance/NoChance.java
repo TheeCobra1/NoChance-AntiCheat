@@ -47,6 +47,7 @@ public final class NoChance extends JavaPlugin {
     private PacketAnalyzer packetAnalyzer;
     private TransactionTracker transactionTracker;
     private PacketIntegrityCheck packetIntegrityCheck;
+    private Improbable improbable;
     private DetectionEngine detectionEngine;
     private UpdateChecker updateChecker;
     private CheckRegistry checkRegistry;
@@ -169,6 +170,7 @@ public final class NoChance extends JavaPlugin {
         packetAnalyzer.setPacketFingerprint(packetFingerprint);
         packetIntegrityCheck = new PacketIntegrityCheck(this);
         packetAnalyzer.setIntegrityCheck(packetIntegrityCheck);
+        improbable = new Improbable();
         multiLayerValidator.setPacketAnalyzer(packetAnalyzer);
 
         transactionTracker = new TransactionTracker(this);
@@ -480,6 +482,10 @@ public final class NoChance extends JavaPlugin {
 
     public TransactionTracker getTransactionTracker() {
         return transactionTracker;
+    }
+
+    public Improbable getImprobable() {
+        return improbable;
     }
 
     public LiveOverlay getLiveOverlay() {
