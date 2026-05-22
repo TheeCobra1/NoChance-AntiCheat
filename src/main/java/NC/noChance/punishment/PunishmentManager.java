@@ -18,6 +18,8 @@ public class PunishmentManager {
     private final PunishmentExecutor executor;
     private final PunishmentHistory history;
     private final Map<UUID, Object> playerLocks = new ConcurrentHashMap<>();
+    private final Map<UUID, Long> inFlightUntil = new ConcurrentHashMap<>();
+    private static final long IN_FLIGHT_GUARD_MS = 2_000L;
 
     public PunishmentManager(Plugin plugin, ACConfig config, DatabaseManager database) {
         this.config = config;
@@ -71,6 +73,12 @@ public class PunishmentManager {
             PunishmentLadder.LadderResult result = ladder.decide(totalViolations, typeViolations, confidenceLevel);
 
             if (result.decision != PunishmentDecision.NONE) {
+                long now = System.currentTimeMillis();
+                Long blockUntil = inFlightUntil.get(uuid);
+                if (blockUntil != null && now < blockUntil) {
+                    return;
+                }
+                inFlightUntil.put(uuid, now + IN_FLIGHT_GUARD_MS);
                 String reason = executor.formatReason(player, result.reasonKey, type, confidenceLevel);
                 history.record(uuid, player.getName(), result.dbType, reason, result.duration);
                 executor.execute(player, result, type, confidenceLevel);
@@ -83,6 +91,7 @@ public class PunishmentManager {
         history.cleanup(uuid);
         executor.cleanup(uuid);
         playerLocks.remove(uuid);
+        inFlightUntil.remove(uuid);
     }
 
     public Map<UUID, Long> getLastWarningTimeMap() {

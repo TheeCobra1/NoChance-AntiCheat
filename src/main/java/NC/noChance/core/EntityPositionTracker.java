@@ -116,7 +116,10 @@ public class EntityPositionTracker {
 
         history.entrySet().removeIf(e -> {
             Deque<Snapshot> q = e.getValue();
-            Snapshot newest = q.peekFirst();
+            Snapshot newest;
+            synchronized (q) {
+                newest = q.peekFirst();
+            }
             return newest == null || newest.time < staleBefore;
         });
     }
