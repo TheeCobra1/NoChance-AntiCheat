@@ -768,6 +768,13 @@ public class PlayerListener implements Listener {
         if (player.isRiptiding()) data.touchRiptide();
         if (data.riptideActiveTicks > 0) data.riptideActiveTicks--;
         if (data.flyDisableGraceTicks > 0) data.flyDisableGraceTicks--;
+
+        if (checks.getKeepSprintCheck() != null) {
+            CheckResult ksResult = checks.getKeepSprintCheck().checkPostHit(player);
+            if (ksResult.isFailed()) {
+                handleMultiLayerValidation(player, ksResult, ViolationType.VELOCITY);
+            }
+        }
         org.bukkit.Location lc = event.getTo();
         if (lc != null) {
             org.bukkit.World w = lc.getWorld();
@@ -919,6 +926,10 @@ public class PlayerListener implements Listener {
 
         CheckResult autoClickerResult = checks.getAutoClickerCheck().check(player);
         handleMultiLayerValidation(player, autoClickerResult, ViolationType.AUTOCLICKER);
+
+        if (checks.getKeepSprintCheck() != null) {
+            checks.getKeepSprintCheck().recordAttack(player);
+        }
 
         CheckResult aimAssistResult = checks.getAimAssistCheck().check(player, event.getEntity());
         handleMultiLayerValidation(player, aimAssistResult, ViolationType.AIMASSIST);

@@ -39,6 +39,7 @@ public class CheckRegistry {
     private ScaffoldCheck scaffoldCheck;
     private TimerCheck timerCheck;
     private VelocityCheck velocityCheck;
+    private KeepSprintCheck keepSprintCheck;
     private CriticalsCheck criticalsCheck;
     private PhaseCheck phaseCheck;
     private StepCheck stepCheck;
@@ -87,6 +88,7 @@ public class CheckRegistry {
         scaffoldCheck = new ScaffoldCheck(config, playerDataMap, filtering);
         timerCheck = new TimerCheck(config, playerDataMap, filtering);
         velocityCheck = new VelocityCheck(config, playerDataMap, filtering);
+        keepSprintCheck = new KeepSprintCheck(config, playerDataMap, filtering);
         criticalsCheck = new CriticalsCheck(config, playerDataMap, filtering);
         phaseCheck = new PhaseCheck(config, playerDataMap, filtering);
         stepCheck = new StepCheck(config, playerDataMap, filtering);
@@ -195,6 +197,7 @@ public class CheckRegistry {
         scaffoldCheck.cleanup(playerId);
         timerCheck.cleanup(playerId);
         velocityCheck.cleanup(playerId);
+        keepSprintCheck.cleanup(playerId);
         criticalsCheck.cleanup(playerId);
         phaseCheck.cleanup(playerId);
         stepCheck.cleanup(playerId);
@@ -247,6 +250,7 @@ public class CheckRegistry {
         scaffoldCheck.cleanup(playerId);
         timerCheck.cleanup(playerId);
         velocityCheck.cleanup(playerId);
+        keepSprintCheck.cleanup(playerId);
         criticalsCheck.cleanup(playerId);
         phaseCheck.cleanup(playerId);
         stepCheck.cleanup(playerId);
@@ -282,6 +286,7 @@ public class CheckRegistry {
     public ScaffoldCheck getScaffoldCheck() { return scaffoldCheck; }
     public TimerCheck getTimerCheck() { return timerCheck; }
     public VelocityCheck getVelocityCheck() { return velocityCheck; }
+    public KeepSprintCheck getKeepSprintCheck() { return keepSprintCheck; }
     public CriticalsCheck getCriticalsCheck() { return criticalsCheck; }
     public PhaseCheck getPhaseCheck() { return phaseCheck; }
     public StepCheck getStepCheck() { return stepCheck; }
