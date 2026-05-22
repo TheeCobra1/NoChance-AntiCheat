@@ -149,6 +149,10 @@ checks:
     # enable only if you've seen straight-line fly cheats slipping past speed
     horizontal_enabled: false
 
+  # detects void-escape teleport / hover modes
+  antivoid:
+    enabled: true
+
   # catches speed hacks, bhop, strafe
   speed:
     enabled: true
