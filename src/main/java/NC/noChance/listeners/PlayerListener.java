@@ -1120,6 +1120,10 @@ public class PlayerListener implements Listener {
         CheckResult protocolSneak = checks.getProtocolCheck().checkState(player,
             new ProtocolCheck.StateEvent(ProtocolCheck.EventType.SNEAK, System.currentTimeMillis()));
         handleMultiLayerValidation(player, protocolSneak, ViolationType.PROTOCOL);
+
+        if (event.isSneaking() && checks.getScaffoldCheck() != null) {
+            checks.getScaffoldCheck().recordSneakOn(player.getUniqueId());
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

@@ -19,6 +19,7 @@ public class ScaffoldCheck {
     private final Map<UUID, List<BlockPlaceRecord>> recentPlacements;
     private final Map<UUID, Deque<PlaceEvent>> placeEvents;
     private final Map<UUID, Deque<Long>> headcraneHits;
+    private final Map<UUID, Deque<Long>> sneakOnPulses = new ConcurrentHashMap<>();
 
     private static final double LOOK_DOWN_PITCH_THRESHOLD = 60.0;
     private static final double BRIDGING_ANGLE_MIN = 45.0;
@@ -27,6 +28,9 @@ public class ScaffoldCheck {
     private static final double HEADCRANE_PITCH_MAX = -10.0;
     private static final long HEADCRANE_WINDOW_MS = 10_000L;
     private static final int HEADCRANE_MIN_HITS = 3;
+
+    private static final long EAGLE_WINDOW_MS = 5_000L;
+    private static final int EAGLE_MIN_PULSES = 6;
 
     private static final double GODBRIDGE_PITCH_CENTER = 75.65;
     private static final double GODBRIDGE_PITCH_BAND = 1.2;
@@ -92,6 +96,11 @@ public class ScaffoldCheck {
         CheckResult godBridgeResult = checkGodBridgePitch(player, snapshot);
         if (godBridgeResult.isFailed()) {
             return godBridgeResult;
+        }
+
+        CheckResult eagleResult = checkEagle(player, playerId, blockLoc);
+        if (eagleResult.isFailed()) {
+            return eagleResult;
         }
 
         if (BlockCache.isType(blockLoc, org.bukkit.Material.SCAFFOLDING)) {
@@ -364,6 +373,7 @@ public class ScaffoldCheck {
         recentPlacements.remove(playerId);
         placeEvents.remove(playerId);
         headcraneHits.remove(playerId);
+        sneakOnPulses.remove(playerId);
     }
 
     public void cleanupStale() {
@@ -487,6 +497,46 @@ public class ScaffoldCheck {
                         pitch, hits, blockLoc.getY(), pl.getY())
         );
 
+        if (!filtering.passesLayer2HeuristicFiltering(player, ViolationType.SCAFFOLD, prelim)) {
+            return CheckResult.passed();
+        }
+        return prelim;
+    }
+
+    public void recordSneakOn(UUID playerId) {
+        if (playerId == null) return;
+        long now = System.currentTimeMillis();
+        Deque<Long> q = sneakOnPulses.computeIfAbsent(playerId, k -> new ArrayDeque<>());
+        synchronized (q) {
+            q.addLast(now);
+            while (!q.isEmpty() && now - q.peekFirst() > EAGLE_WINDOW_MS) {
+                q.pollFirst();
+            }
+        }
+    }
+
+    private CheckResult checkEagle(Player player, UUID playerId, Location blockLoc) {
+        Location pl = player.getLocation();
+        if (Math.abs(pl.getY() - 1.0 - blockLoc.getY()) > 0.3) return CheckResult.passed();
+
+        Deque<Long> q = sneakOnPulses.get(playerId);
+        if (q == null) return CheckResult.passed();
+        int pulses;
+        long now = System.currentTimeMillis();
+        synchronized (q) {
+            while (!q.isEmpty() && now - q.peekFirst() > EAGLE_WINDOW_MS) {
+                q.pollFirst();
+            }
+            pulses = q.size();
+        }
+        if (pulses < EAGLE_MIN_PULSES) return CheckResult.passed();
+
+        double severity = Math.min(0.95, 0.74 + (pulses - EAGLE_MIN_PULSES) * 0.03);
+        CheckResult prelim = CheckResult.failed(
+                ViolationType.SCAFFOLD,
+                severity,
+                String.format("SCAFFOLD_EAGLE pulses=%d/5s", pulses)
+        );
         if (!filtering.passesLayer2HeuristicFiltering(player, ViolationType.SCAFFOLD, prelim)) {
             return CheckResult.passed();
         }
