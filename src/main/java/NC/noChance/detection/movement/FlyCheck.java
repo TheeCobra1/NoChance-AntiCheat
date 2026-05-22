@@ -684,7 +684,7 @@ public class FlyCheck {
             baseTolerance += 0.12;
         }
 
-        return baseTolerance;
+        return Math.min(1.5, baseTolerance);
     }
 
     private double getJumpVelocity(Player player, Location loc, double deltaY) {

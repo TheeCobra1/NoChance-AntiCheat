@@ -28,7 +28,7 @@ public class ConfigValidator {
             "killaura", "nofall", "autoclicker", "reach", "inventory", "scaffold",
             "timer", "velocity", "criticals", "phase", "step", "blink", "noslow",
             "groundspoof", "elytrafly", "strider", "boatfly",
-            "aimassist", "interact", "protocol"
+            "aimassist", "interact", "protocol", "antivoid"
     );
 
     private static final List<String> KNOWN_TOP_LEVEL_KEYS = Arrays.asList(
