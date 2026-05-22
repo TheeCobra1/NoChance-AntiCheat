@@ -169,8 +169,22 @@ public class FastBreakCheck {
 
         EnhancementTracker.BlockBreakEnhancements enhancements = initialEnhancements;
         if (toolWasSwitched || efficiencyChanged) {
-            if (currentEnhancements.getBreakSpeedMultiplier() > initialEnhancements.getBreakSpeedMultiplier()) {
+            double initSpeed = initialEnhancements.getBreakSpeedMultiplier();
+            double curSpeed = currentEnhancements.getBreakSpeedMultiplier();
+            if (curSpeed > initSpeed) {
                 enhancements = currentEnhancements;
+                if (initSpeed > 0 && curSpeed / initSpeed >= 3.0 && block.getType().getHardness() >= 1.0) {
+                    double severity = Math.min(0.95, 0.78 + Math.min(0.15, (curSpeed / initSpeed - 3.0) * 0.02));
+                    CheckResult prelim = CheckResult.failed(
+                            ViolationType.FASTBREAK,
+                            severity,
+                            String.format("PacketMine: started with %s (speed %.2f), broke with %s (speed %.2f)",
+                                    initialTool, initSpeed, currentToolName, curSpeed)
+                    );
+                    if (filtering.passesLayer2HeuristicFiltering(player, ViolationType.FASTBREAK, prelim)) {
+                        return prelim;
+                    }
+                }
             }
         }
 
