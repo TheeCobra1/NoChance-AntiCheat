@@ -46,6 +46,7 @@ public final class NoChance extends JavaPlugin {
     private MultiLayerValidator multiLayerValidator;
     private PacketAnalyzer packetAnalyzer;
     private TransactionTracker transactionTracker;
+    private PacketIntegrityCheck packetIntegrityCheck;
     private DetectionEngine detectionEngine;
     private UpdateChecker updateChecker;
     private CheckRegistry checkRegistry;
@@ -166,6 +167,8 @@ public final class NoChance extends JavaPlugin {
 
         packetAnalyzer = new PacketAnalyzer(this, config, checkRegistry.getBlinkCheck());
         packetAnalyzer.setPacketFingerprint(packetFingerprint);
+        packetIntegrityCheck = new PacketIntegrityCheck(this);
+        packetAnalyzer.setIntegrityCheck(packetIntegrityCheck);
         multiLayerValidator.setPacketAnalyzer(packetAnalyzer);
 
         transactionTracker = new TransactionTracker(this);

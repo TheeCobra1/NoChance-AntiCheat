@@ -23,6 +23,7 @@ public class PacketAnalyzer {
     private final BlinkCheck blinkCheck;
     private PacketFingerprint packetFingerprint;
     private TransactionTracker transactionTracker;
+    private PacketIntegrityCheck integrityCheck;
     private PacketListenerAbstract registeredListener;
 
     public PacketAnalyzer(Plugin plugin, ACConfig config, BlinkCheck blinkCheck) {
@@ -43,6 +44,10 @@ public class PacketAnalyzer {
 
     public void setTransactionTracker(TransactionTracker transactionTracker) {
         this.transactionTracker = transactionTracker;
+    }
+
+    public void setIntegrityCheck(PacketIntegrityCheck integrityCheck) {
+        this.integrityCheck = integrityCheck;
     }
 
     public void shutdown() {
@@ -68,6 +73,11 @@ public class PacketAnalyzer {
                     }
 
                     player = (Player) playerObj;
+
+                    if (integrityCheck != null && integrityCheck.inspect(event, player)) {
+                        return;
+                    }
+
                     PacketData data = packetDataMap.computeIfAbsent(player.getUniqueId(), k -> new PacketData());
 
                     long timestamp = System.currentTimeMillis();
@@ -168,6 +178,7 @@ public class PacketAnalyzer {
 
     public void cleanup(UUID playerId) {
         packetDataMap.remove(playerId);
+        if (integrityCheck != null) integrityCheck.cleanup(playerId);
     }
 
     public static class PacketViolationResult {
