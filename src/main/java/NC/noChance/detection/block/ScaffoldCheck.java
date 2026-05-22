@@ -32,6 +32,10 @@ public class ScaffoldCheck {
     private static final long EAGLE_WINDOW_MS = 5_000L;
     private static final int EAGLE_MIN_PULSES = 6;
 
+    private static final int TELLY_MIN_SAMPLES = 6;
+    private static final double TELLY_DESCEND_THRESHOLD = -0.05;
+    private static final double TELLY_DESCEND_RATIO = 0.85;
+
     private static final double GODBRIDGE_PITCH_CENTER = 75.65;
     private static final double GODBRIDGE_PITCH_BAND = 1.2;
     private static final int GODBRIDGE_MIN_PLACEMENTS = 3;
@@ -85,10 +89,11 @@ public class ScaffoldCheck {
         float pitch = player.getLocation().getPitch();
         boolean lookingDown = pitch >= LOOK_DOWN_PITCH_THRESHOLD;
 
+        double velY = player.getVelocity().getY();
         List<BlockPlaceRecord> placements = recentPlacements.computeIfAbsent(playerId, k -> Collections.synchronizedList(new ArrayList<>()));
         List<BlockPlaceRecord> snapshot;
         synchronized (placements) {
-            placements.add(new BlockPlaceRecord(blockLoc, now, pitch));
+            placements.add(new BlockPlaceRecord(blockLoc, now, pitch, velY));
             placements.removeIf(record -> now - record.timestamp > 3000);
             snapshot = new ArrayList<>(placements);
         }
@@ -101,6 +106,11 @@ public class ScaffoldCheck {
         CheckResult eagleResult = checkEagle(player, playerId, blockLoc);
         if (eagleResult.isFailed()) {
             return eagleResult;
+        }
+
+        CheckResult tellyResult = checkTellyCadence(player, snapshot);
+        if (tellyResult.isFailed()) {
+            return tellyResult;
         }
 
         if (BlockCache.isType(blockLoc, org.bukkit.Material.SCAFFOLDING)) {
@@ -543,6 +553,47 @@ public class ScaffoldCheck {
         return prelim;
     }
 
+    private CheckResult checkTellyCadence(Player player, List<BlockPlaceRecord> snapshot) {
+        if (snapshot == null || snapshot.size() < TELLY_MIN_SAMPLES) return CheckResult.passed();
+        int descending = 0;
+        int total = 0;
+        for (BlockPlaceRecord rec : snapshot) {
+            if (rec.velocityY <= TELLY_DESCEND_THRESHOLD) descending++;
+            total++;
+        }
+        if (total < TELLY_MIN_SAMPLES) return CheckResult.passed();
+        double ratio = (double) descending / total;
+        if (ratio < TELLY_DESCEND_RATIO) return CheckResult.passed();
+
+        long minDelta = Long.MAX_VALUE;
+        long maxDelta = Long.MIN_VALUE;
+        long sumDelta = 0;
+        int deltaCount = 0;
+        for (int i = 1; i < snapshot.size(); i++) {
+            long d = snapshot.get(i).timestamp - snapshot.get(i - 1).timestamp;
+            if (d <= 0) continue;
+            if (d < minDelta) minDelta = d;
+            if (d > maxDelta) maxDelta = d;
+            sumDelta += d;
+            deltaCount++;
+        }
+        if (deltaCount < TELLY_MIN_SAMPLES - 1) return CheckResult.passed();
+        double avgDelta = sumDelta / (double) deltaCount;
+        double spread = maxDelta - minDelta;
+        if (spread > avgDelta * 0.5) return CheckResult.passed();
+
+        double severity = Math.min(0.92, 0.74 + (ratio - TELLY_DESCEND_RATIO) * 0.5);
+        CheckResult prelim = CheckResult.failed(
+                ViolationType.SCAFFOLD_BRIDGE,
+                severity,
+                String.format("SCAFFOLD_TELLY descend=%d/%d avg=%.0fms spread=%.0fms", descending, total, avgDelta, spread)
+        );
+        if (!filtering.passesLayer2HeuristicFiltering(player, ViolationType.SCAFFOLD_BRIDGE, prelim)) {
+            return CheckResult.passed();
+        }
+        return prelim;
+    }
+
     private CheckResult checkGodBridgePitch(Player player, List<BlockPlaceRecord> snapshot) {
         if (snapshot == null || snapshot.size() < GODBRIDGE_MIN_PLACEMENTS) return CheckResult.passed();
 
@@ -616,11 +667,17 @@ public class ScaffoldCheck {
         final Location location;
         final long timestamp;
         final float pitch;
+        final double velocityY;
 
         BlockPlaceRecord(Location location, long timestamp, float pitch) {
+            this(location, timestamp, pitch, 0.0);
+        }
+
+        BlockPlaceRecord(Location location, long timestamp, float pitch, double velocityY) {
             this.location = location;
             this.timestamp = timestamp;
             this.pitch = pitch;
+            this.velocityY = velocityY;
         }
     }
 }
