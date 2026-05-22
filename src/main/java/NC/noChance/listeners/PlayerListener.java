@@ -782,6 +782,10 @@ public class PlayerListener implements Listener {
                 handleMultiLayerValidation(player, avResult, ViolationType.FLY);
             }
         }
+
+        if (checks.getCriticalsCheck() != null) {
+            checks.getCriticalsCheck().recordMovement(player, event.getFrom(), to);
+        }
         org.bukkit.Location lc = event.getTo();
         if (lc != null) {
             org.bukkit.World w = lc.getWorld();

@@ -17,12 +17,50 @@ public class CriticalsCheck {
     private final Map<UUID, PlayerData> playerDataMap;
     private final LayerFiltering filtering;
     private final Map<UUID, CriticalTracker> trackers;
+    private final Map<UUID, MoveRing> moveRings = new ConcurrentHashMap<>();
+
+    private static final int MOVE_RING_SIZE = 6;
+    private static final double PACKET_JITTER_Y = 0.075;
+    private static final double PACKET_JITTER_HORIZ = 0.02;
 
     public CriticalsCheck(ACConfig config, Map<UUID, PlayerData> playerDataMap, LayerFiltering filtering) {
         this.config = config;
         this.playerDataMap = playerDataMap;
         this.filtering = filtering;
         this.trackers = new ConcurrentHashMap<>();
+    }
+
+    public void recordMovement(Player player, org.bukkit.Location from, org.bukkit.Location to) {
+        if (player == null || from == null || to == null) return;
+        UUID uuid = player.getUniqueId();
+        MoveRing r = moveRings.computeIfAbsent(uuid, k -> new MoveRing());
+        synchronized (r) {
+            r.add(to.getY() - from.getY(), Math.abs(to.getX() - from.getX()) + Math.abs(to.getZ() - from.getZ()));
+        }
+    }
+
+    private boolean hasPacketJitterPattern(UUID uuid) {
+        MoveRing r = moveRings.get(uuid);
+        if (r == null) return false;
+        double[] dyCopy;
+        double[] horizCopy;
+        int count;
+        synchronized (r) {
+            count = r.count;
+            if (count < 4) return false;
+            dyCopy = r.dy.clone();
+            horizCopy = r.horiz.clone();
+        }
+        int signFlips = 0;
+        int microY = 0;
+        int zeroHoriz = 0;
+        for (int i = 0; i < count; i++) {
+            if (horizCopy[i] < PACKET_JITTER_HORIZ) zeroHoriz++;
+            double absY = Math.abs(dyCopy[i]);
+            if (absY > 0 && absY < PACKET_JITTER_Y) microY++;
+            if (i > 0 && dyCopy[i] != 0 && dyCopy[i - 1] != 0 && Math.signum(dyCopy[i]) != Math.signum(dyCopy[i - 1])) signFlips++;
+        }
+        return zeroHoriz >= 4 && microY >= 3 && signFlips >= 2;
     }
 
     public CheckResult check(Player player, Entity target, boolean isCritical) {
@@ -118,6 +156,18 @@ public class CriticalsCheck {
         String belowName = below.getType().name();
         boolean onStairOrSlab = belowName.contains("STAIRS") || belowName.contains("SLAB");
 
+        if (hasPacketJitterPattern(uuid)) {
+            CheckResult prelim = CheckResult.failed(
+                    ViolationType.CRITICALS,
+                    0.92,
+                    "CRITICALS_PACKET: micro-Y jitter pattern with no horizontal movement"
+            );
+            if (!filtering.passesLayer2HeuristicFiltering(player, ViolationType.CRITICALS, prelim)) {
+                return CheckResult.passed();
+            }
+            return prelim;
+        }
+
         if ((onGround && fallDistance < 0.1 && Math.abs(verticalVelocity) < velThreshold) || microHop) {
             tracker.recordSuspiciousCrit();
 
@@ -181,6 +231,7 @@ public class CriticalsCheck {
 
     public void cleanup(UUID uuid) {
         trackers.remove(uuid);
+        moveRings.remove(uuid);
     }
 
     private boolean isInCobweb(Player player) {
@@ -242,6 +293,20 @@ public class CriticalsCheck {
 
         double getCriticalRate() {
             return totalHits > 0 ? (double) criticalHits / totalHits : 0.0;
+        }
+    }
+
+    private static class MoveRing {
+        final double[] dy = new double[MOVE_RING_SIZE];
+        final double[] horiz = new double[MOVE_RING_SIZE];
+        int idx = 0;
+        int count = 0;
+
+        void add(double dyVal, double horizVal) {
+            dy[idx] = dyVal;
+            horiz[idx] = horizVal;
+            idx = (idx + 1) % MOVE_RING_SIZE;
+            if (count < MOVE_RING_SIZE) count++;
         }
     }
 }
