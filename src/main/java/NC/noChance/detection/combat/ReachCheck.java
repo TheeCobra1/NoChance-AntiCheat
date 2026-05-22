@@ -48,6 +48,7 @@ public class ReachCheck {
     }
 
     private KillAuraCheck killAuraCheck;
+    private EntityPositionTracker positionTracker;
 
     public ReachCheck(ACConfig config, Map<UUID, PlayerData> playerDataMap, LayerFiltering filtering, CombatTracker combatTracker) {
         this.config = config;
@@ -58,6 +59,10 @@ public class ReachCheck {
 
     public void setKillAuraCheck(KillAuraCheck killAuraCheck) {
         this.killAuraCheck = killAuraCheck;
+    }
+
+    public void setPositionTracker(EntityPositionTracker positionTracker) {
+        this.positionTracker = positionTracker;
     }
 
     public CheckResult checkEntityReach(Player player, Entity target) {
@@ -100,10 +105,14 @@ public class ReachCheck {
         combatTracker.recordPlayerHit(player, target, 1.0);
 
         int ping = filtering.getPing(player);
-        PrecisionReach.ReachResult result = PrecisionReach.checkEntityReach(player, target, ping);
-
         Location eyeLoc = player.getEyeLocation();
         Vector eyePos = eyeLoc.toVector();
+
+        BoundingBox historicalBox = null;
+        if (positionTracker != null) {
+            historicalBox = positionTracker.getClosestBoxTo(target, eyePos, ping);
+        }
+        PrecisionReach.ReachResult result = PrecisionReach.checkEntityReach(player, target, historicalBox, ping);
         Vector lookDir = eyeLoc.getDirection().normalize();
 
         UUID targetId = target.getUniqueId();

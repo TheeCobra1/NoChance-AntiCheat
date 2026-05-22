@@ -48,6 +48,7 @@ public final class NoChance extends JavaPlugin {
     private TransactionTracker transactionTracker;
     private PacketIntegrityCheck packetIntegrityCheck;
     private Improbable improbable;
+    private EntityPositionTracker entityPositionTracker;
     private DetectionEngine detectionEngine;
     private UpdateChecker updateChecker;
     private CheckRegistry checkRegistry;
@@ -182,6 +183,12 @@ public final class NoChance extends JavaPlugin {
             checkRegistry.getBlinkCheck().setTransactionTracker(transactionTracker);
         }
         transactionTracker.start();
+
+        entityPositionTracker = new EntityPositionTracker(this);
+        if (checkRegistry != null && checkRegistry.getReachCheck() != null) {
+            checkRegistry.getReachCheck().setPositionTracker(entityPositionTracker);
+        }
+        entityPositionTracker.start();
 
         predictionEngine = new PredictionEngine();
         multiLayerValidator.setPredictionEngine(predictionEngine);
@@ -403,6 +410,10 @@ public final class NoChance extends JavaPlugin {
 
         if (transactionTracker != null) {
             transactionTracker.shutdown();
+        }
+
+        if (entityPositionTracker != null) {
+            entityPositionTracker.shutdown();
         }
 
         if (playerDataMap != null) {

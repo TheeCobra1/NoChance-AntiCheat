@@ -68,11 +68,15 @@ public class PrecisionReach {
     }
 
     public static ReachResult checkEntityReach(Player player, Entity target, int ping) {
+        return checkEntityReach(player, target, target == null ? null : target.getBoundingBox(), ping);
+    }
+
+    public static ReachResult checkEntityReach(Player player, Entity target, BoundingBox suppliedBox, int ping) {
         Location eyeLocation = player.getEyeLocation();
         Vector eyePos = eyeLocation.toVector();
         Vector lookDirection = eyeLocation.getDirection().normalize();
 
-        BoundingBox targetBox = target.getBoundingBox();
+        BoundingBox targetBox = suppliedBox != null ? suppliedBox : target.getBoundingBox();
         BoundingBox expandedBox = expandBoxForLatency(targetBox, ping, target.getVelocity());
 
         Vector closestPoint = getClosestPointOnBox(eyePos, targetBox);
