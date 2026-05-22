@@ -298,7 +298,13 @@ public class WebRunner {
     }
 
     private UUID resolveUuid(JsonObject p) {
-        if (p.has("uuid")) return UUID.fromString(p.get("uuid").getAsString());
+        if (p.has("uuid")) {
+            try {
+                return UUID.fromString(p.get("uuid").getAsString());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("invalid uuid format");
+            }
+        }
         if (p.has("name")) return Bukkit.getOfflinePlayer(p.get("name").getAsString()).getUniqueId();
         throw new IllegalArgumentException("uuid or name required");
     }
@@ -306,8 +312,13 @@ public class WebRunner {
     private String resolveName(JsonObject p) {
         if (p.has("name")) return p.get("name").getAsString();
         if (p.has("uuid")) {
-            OfflinePlayer op = Bukkit.getOfflinePlayer(UUID.fromString(p.get("uuid").getAsString()));
-            return op.getName();
+            try {
+                OfflinePlayer op = Bukkit.getOfflinePlayer(UUID.fromString(p.get("uuid").getAsString()));
+                String n = op.getName();
+                return n;
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
         }
         return null;
     }

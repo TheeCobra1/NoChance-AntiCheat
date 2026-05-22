@@ -750,6 +750,14 @@ public class DatabaseManager {
 
     private void executeUpdate(String sql, String... params) {
         if (dataSource == null || dataSource.isClosed()) return;
+        int placeholders = 0;
+        for (int i = 0; i < sql.length(); i++) {
+            if (sql.charAt(i) == '?') placeholders++;
+        }
+        if (placeholders != params.length) {
+            plugin.getLogger().severe("executeUpdate param count mismatch: sql=" + placeholders + " params=" + params.length);
+            return;
+        }
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {

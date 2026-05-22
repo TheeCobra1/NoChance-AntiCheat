@@ -510,7 +510,10 @@ public class WebBridge {
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestProperty("Accept", "application/json");
             conn.setRequestProperty("User-Agent", "NoChance/" + plugin.getDescription().getVersion() + " (Spigot)");
-            if (bearer != null) conn.setRequestProperty("Authorization", "Bearer " + bearer);
+            if (bearer != null) {
+                String safe = bearer.replaceAll("[\\r\\n\\u0000-\\u001F\\u007F]", "");
+                if (!safe.isEmpty()) conn.setRequestProperty("Authorization", "Bearer " + safe);
+            }
             conn.setDoOutput(true);
             conn.setConnectTimeout(5000);
             conn.setReadTimeout(8000);

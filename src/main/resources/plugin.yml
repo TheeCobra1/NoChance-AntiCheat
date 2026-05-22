@@ -1,5 +1,5 @@
 name: NoChance
-version: '1.5.7'
+version: '1.6.0'
 main: NC.noChance.NoChance
 api-version: '1.21'
 author: Cobra4

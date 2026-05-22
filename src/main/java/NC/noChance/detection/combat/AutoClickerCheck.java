@@ -153,7 +153,7 @@ public class AutoClickerCheck {
 
         if (intervals.size() >= 30) {
             double uniformity = uniformityRatio(intervals);
-            if (uniformity > 0 && uniformity < 1.6 && cps > 4) {
+            if (uniformity >= 0 && uniformity < 1.6 && cps > 4) {
                 CheckResult uniResult = CheckResult.failed(
                         ViolationType.AUTOCLICKER,
                         Math.min(0.95, 0.78 + (1.6 - uniformity) * 0.10),

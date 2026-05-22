@@ -6,7 +6,7 @@
 
     <groupId>NC</groupId>
     <artifactId>nochance</artifactId>
-    <version>1.5.7</version>
+    <version>1.6.0</version>
     <packaging>jar</packaging>
 
     <name>nochance</name>
