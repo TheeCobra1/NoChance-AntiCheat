@@ -98,6 +98,10 @@ public class PunishmentManager {
         return executor.getLastWarningTimeMap();
     }
 
+    public PunishmentExecutor getExecutor() {
+        return executor;
+    }
+
     public Map<UUID, Long> getLastSetbackTimeMap() {
         return executor.getLastSetbackTimeMap();
     }

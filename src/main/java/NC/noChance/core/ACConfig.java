@@ -611,6 +611,18 @@ public class ACConfig {
         return config.getBoolean("bedrock.exempt", true);
     }
 
+    public boolean isMitigationEnabled() {
+        return config.getBoolean("actions.mitigation.enabled", true);
+    }
+
+    public double getMitigationMinConfidence() {
+        return config.getDouble("actions.mitigation.min_confidence", 0.55);
+    }
+
+    public double getMitigationMaxConfidence() {
+        return config.getDouble("actions.mitigation.max_confidence", 0.90);
+    }
+
     public boolean isBedrockRelaxed() {
         return config.getBoolean("bedrock.relaxed_checks", true);
     }

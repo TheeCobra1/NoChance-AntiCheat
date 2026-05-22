@@ -289,6 +289,11 @@ public class PlayerListener implements Listener {
             impCleanup.cleanup(player.getUniqueId());
         }
 
+        MitigationManager mitCleanup = plugin.getMitigationManager();
+        if (mitCleanup != null) {
+            mitCleanup.cleanup(player.getUniqueId());
+        }
+
         if (simBridge != null) {
             simBridge.cleanup(player.getUniqueId());
         }
@@ -339,6 +344,11 @@ public class PlayerListener implements Listener {
         Improbable impCleanup = plugin.getImprobable();
         if (impCleanup != null) {
             impCleanup.cleanup(player.getUniqueId());
+        }
+
+        MitigationManager mitCleanup = plugin.getMitigationManager();
+        if (mitCleanup != null) {
+            mitCleanup.cleanup(player.getUniqueId());
         }
 
         if (simBridge != null) {
@@ -681,22 +691,29 @@ public class PlayerListener implements Listener {
             }
         }
 
+        MitigationManager mitMove = plugin.getMitigationManager();
+
         CheckResult flyResult = checks.getFlyCheck().check(player, event.getFrom(), event.getTo());
+        if (mitMove != null) mitMove.mitigate(player, ViolationType.FLY, flyResult, null);
         handleMultiLayerValidation(player, flyResult, ViolationType.FLY);
 
         CheckResult speedResult = checks.getSpeedCheck().check(player, event.getFrom(), event.getTo());
+        if (mitMove != null) mitMove.mitigate(player, ViolationType.SPEED, speedResult, null);
         handleMultiLayerValidation(player, speedResult, ViolationType.SPEED);
 
         CheckResult noClipResult = checks.getNoClipCheck().check(player, event.getFrom(), event.getTo());
+        if (mitMove != null) mitMove.mitigate(player, ViolationType.NOCLIP, noClipResult, null);
         handleMultiLayerValidation(player, noClipResult, ViolationType.NOCLIP);
 
         CheckResult jesusResult = checks.getJesusCheck().check(player, event.getFrom(), event.getTo());
+        if (mitMove != null) mitMove.mitigate(player, ViolationType.JESUS, jesusResult, null);
         handleMultiLayerValidation(player, jesusResult, ViolationType.JESUS);
 
         CheckResult timerResult = checks.getTimerCheck().check(player);
         handleMultiLayerValidation(player, timerResult, ViolationType.TIMER);
 
         CheckResult phaseResult = checks.getPhaseCheck().check(player, event.getFrom(), event.getTo());
+        if (mitMove != null) mitMove.mitigate(player, ViolationType.PHASE, phaseResult, null);
         handleMultiLayerValidation(player, phaseResult, ViolationType.PHASE);
 
         CheckResult stepResult = checks.getStepCheck().check(player, event.getFrom(), event.getTo());
@@ -858,10 +875,14 @@ public class PlayerListener implements Listener {
 
         BlockCache.invalidate(event.getBlock().getLocation());
 
+        MitigationManager mitBreak = plugin.getMitigationManager();
+
         CheckResult fastBreakResult = checks.getFastBreakCheck().check(player, event.getBlock());
+        if (mitBreak != null) mitBreak.mitigate(player, ViolationType.FASTBREAK, fastBreakResult, event);
         handleMultiLayerValidation(player, fastBreakResult, ViolationType.FASTBREAK);
 
         CheckResult nukerResult = checks.getNukerCheck().check(player, event.getBlock().getLocation());
+        if (mitBreak != null) mitBreak.mitigate(player, ViolationType.NUKER, nukerResult, event);
         handleMultiLayerValidation(player, nukerResult, ViolationType.NUKER);
 
         CheckResult autoToolResult = checks.getAutoToolCheck().onBlockBreak(player);
@@ -906,13 +927,18 @@ public class PlayerListener implements Listener {
             new ProtocolCheck.StateEvent(ProtocolCheck.EventType.PLACE, System.currentTimeMillis()));
         handleMultiLayerValidation(player, protocolPlace, ViolationType.PROTOCOL);
 
+        MitigationManager mitPlace = plugin.getMitigationManager();
+
         CheckResult fastPlaceResult = checks.getFastPlaceCheck().check(player, event.getBlock().getLocation());
+        if (mitPlace != null) mitPlace.mitigate(player, ViolationType.FASTPLACE, fastPlaceResult, event);
         handleMultiLayerValidation(player, fastPlaceResult, ViolationType.FASTPLACE);
 
         CheckResult reachResult = checks.getReachCheck().checkBlockReach(player, event.getBlock());
+        if (mitPlace != null) mitPlace.mitigate(player, ViolationType.REACH, reachResult, event);
         handleMultiLayerValidation(player, reachResult, ViolationType.REACH);
 
         CheckResult scaffoldResult = checks.getScaffoldCheck().check(player, event.getBlock());
+        if (mitPlace != null) mitPlace.mitigate(player, ViolationType.SCAFFOLD, scaffoldResult, event);
         handleMultiLayerValidation(player, scaffoldResult, ViolationType.SCAFFOLD);
     }
 
@@ -948,9 +974,12 @@ public class PlayerListener implements Listener {
         CheckResult killAuraResult = checks.getKillAuraCheck().check(player, event.getEntity());
         ViolationType type = killAuraResult.getViolationType();
         if (type == null) type = ViolationType.KILLAURA;
+        MitigationManager mit = plugin.getMitigationManager();
+        if (mit != null) mit.mitigate(player, type, killAuraResult, event);
         handleMultiLayerValidation(player, killAuraResult, type);
 
         CheckResult reachResult = checks.getReachCheck().checkEntityReach(player, event.getEntity());
+        if (mit != null) mit.mitigate(player, ViolationType.REACH, reachResult, event);
         handleMultiLayerValidation(player, reachResult, ViolationType.REACH);
 
         CheckResult autoClickerResult = checks.getAutoClickerCheck().check(player);

@@ -49,6 +49,7 @@ public final class NoChance extends JavaPlugin {
     private PacketIntegrityCheck packetIntegrityCheck;
     private Improbable improbable;
     private EntityPositionTracker entityPositionTracker;
+    private MitigationManager mitigationManager;
     private DetectionEngine detectionEngine;
     private UpdateChecker updateChecker;
     private CheckRegistry checkRegistry;
@@ -142,6 +143,9 @@ public final class NoChance extends JavaPlugin {
         punishmentManager = new PunishmentManager(this, config, database);
         punishmentManager.setAlertManager(alertManager);
         punishmentManager.setPlayerDataMap(playerDataMap);
+
+        mitigationManager = new MitigationManager(config);
+        mitigationManager.setExecutor(punishmentManager.getExecutor());
 
         if (config.isDiscordEnabled() && !config.getDiscordWebhook().isEmpty()) {
             alertManager.setDiscordWebhook(config.getDiscordWebhook());
@@ -497,6 +501,10 @@ public final class NoChance extends JavaPlugin {
 
     public Improbable getImprobable() {
         return improbable;
+    }
+
+    public MitigationManager getMitigationManager() {
+        return mitigationManager;
     }
 
     public LiveOverlay getLiveOverlay() {
