@@ -116,8 +116,8 @@ public class NoFallCheck {
             }
         }
 
-        if (clientOnGround && tracker.getConsecutiveFallTicks() > 1 && player.getFallDistance() > 1.5) {
-            double severity = Math.min(0.97, 0.88 + player.getFallDistance() * 0.01);
+        if (clientOnGround && tracker.getConsecutiveFallTicks() > 3 && player.getFallDistance() > 2.5) {
+            double severity = Math.min(0.95, 0.82 + player.getFallDistance() * 0.01);
             CheckResult lastTickResult = CheckResult.failed(
                 ViolationType.NOFALL,
                 severity,
@@ -292,6 +292,15 @@ public class NoFallCheck {
             return CheckResult.passed();
         }
 
+        org.bukkit.potion.PotionEffectType resistType = org.bukkit.potion.PotionEffectType.getByName("RESISTANCE");
+        if (resistType == null) resistType = org.bukkit.potion.PotionEffectType.getByName("DAMAGE_RESISTANCE");
+        if (resistType != null && player.hasPotionEffect(resistType)) {
+            var eff = player.getPotionEffect(resistType);
+            if (eff != null && eff.getAmplifier() >= 4) {
+                return CheckResult.passed();
+            }
+        }
+
         if (data.hasRecentEnderPearl(3000)) {
             return CheckResult.passed();
         }
@@ -321,14 +330,22 @@ public class NoFallCheck {
         expectedDamage = applyArmorReduction(player, expectedDamage);
 
         double actualDamage = 0.0;
+        double rawDamage = 0.0;
+        boolean externallyReduced = false;
         if (event != null && event.getCause() == EntityDamageEvent.DamageCause.FALL) {
-            actualDamage = event.getDamage();
+            actualDamage = event.getFinalDamage();
+            rawDamage = event.getDamage();
+            externallyReduced = rawDamage < expectedDamage * 0.5;
         }
 
         data.resetFallDistance();
         tracker.resetFall();
 
         if (expectedDamage < 1.0) {
+            return CheckResult.passed();
+        }
+
+        if (externallyReduced) {
             return CheckResult.passed();
         }
 
@@ -507,14 +524,18 @@ public class NoFallCheck {
         if (type == Material.WATER || type == Material.LAVA) return true;
         if (type == Material.COBWEB) return true;
         if (type == Material.POWDER_SNOW) return true;
+        if (type == Material.BUBBLE_COLUMN) return true;
         if (type.name().contains("VINE")) return true;
         if (type.name().contains("LADDER")) return true;
         if (type.name().contains("SCAFFOLDING")) return true;
+        if (type.name().contains("KELP")) return true;
+        if (type.name().contains("SEAGRASS")) return true;
 
         if (below == Material.SLIME_BLOCK) return true;
         if (below == Material.HONEY_BLOCK) return true;
         if (below == Material.HAY_BLOCK) return true;
         if (below.name().contains("BED")) return true;
+        if (below == Material.WATER || below == Material.LAVA) return true;
 
         return false;
     }
