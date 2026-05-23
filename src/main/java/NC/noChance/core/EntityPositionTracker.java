@@ -31,7 +31,7 @@ public class EntityPositionTracker {
         if (running) return;
         running = true;
         try {
-            task = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, 1L, 1L);
+            task = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, 2L, 2L);
         } catch (Throwable t) {
             running = false;
         }

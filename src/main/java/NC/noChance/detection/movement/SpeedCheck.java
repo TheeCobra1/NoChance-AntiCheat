@@ -861,8 +861,9 @@ public class SpeedCheck {
             return prelimResult;
         }
 
-        if (physicsValidator != null) {
-            CheckResult phys = physicsValidator.validateSpeed(player, data, from, to);
+        PhysicsValidator pv = physicsValidator;
+        if (pv != null) {
+            CheckResult phys = pv.validateSpeed(player, data, from, to);
             if (phys.isFailed() && filtering.passesLayer2HeuristicFiltering(player, phys.getViolationType(), phys)) {
                 return phys;
             }

@@ -194,8 +194,8 @@ public class GroundSpoofCheck {
                 jumpBoostTolerance = Math.min(1.0, level * 0.3);
             }
         }
-        double adjustedBaseThreshold = BASE_DISTANCE_THRESHOLD + pingTolerance + jumpBoostTolerance;
-        double adjustedNoFallThreshold = NOFALL_DISTANCE_THRESHOLD + pingTolerance + jumpBoostTolerance;
+        double adjustedBaseThreshold = BASE_DISTANCE_THRESHOLD + Math.min(1.2, pingTolerance + jumpBoostTolerance);
+        double adjustedNoFallThreshold = NOFALL_DISTANCE_THRESHOLD + Math.min(1.2, pingTolerance + jumpBoostTolerance);
 
         if (deltaY > 0.0 && deltaY < 0.08) {
             return CheckResult.passed();
