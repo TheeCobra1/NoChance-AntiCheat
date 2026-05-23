@@ -5,23 +5,28 @@ import NC.noChance.core.ACConfig;
 import NC.noChance.core.PlayerData;
 import NC.noChance.core.ViolationType;
 import NC.noChance.database.DatabaseManager;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class PunishmentManager {
+    private final Plugin plugin;
     private final ACConfig config;
     private final PunishmentLadder ladder;
     private final PunishmentExecutor executor;
     private final PunishmentHistory history;
     private final Map<UUID, Object> playerLocks = new ConcurrentHashMap<>();
     private final Map<UUID, Long> inFlightUntil = new ConcurrentHashMap<>();
+    private final Map<UUID, AtomicLong> pendingDecisionToken = new ConcurrentHashMap<>();
     private static final long IN_FLIGHT_GUARD_MS = 2_000L;
 
     public PunishmentManager(Plugin plugin, ACConfig config, DatabaseManager database) {
+        this.plugin = plugin;
         this.config = config;
         this.ladder = new PunishmentLadder(config);
         this.executor = new PunishmentExecutor(plugin, config);
@@ -60,30 +65,58 @@ public class PunishmentManager {
 
             tracker.addViolation(type, severity);
 
-            if (executor.trySetback(player, type)) {
+            boolean mitigated = executor.trySetback(player, type);
+            if (mitigated) {
                 history.logSetback(uuid, player.getName(), type);
+                tracker.markMitigated();
             }
             if (executor.runCustomCommands(player, type, severity, details, confidenceLevel)) {
                 history.logCustomCommand(uuid, player.getName(), type, confidenceLevel);
             }
 
-            int totalViolations = tracker.getTotalViolations();
-            int typeViolations = tracker.getTypeViolations(type);
-
-            PunishmentLadder.LadderResult result = ladder.decide(totalViolations, typeViolations, confidenceLevel);
-
-            if (result.decision != PunishmentDecision.NONE) {
-                long now = System.currentTimeMillis();
-                Long blockUntil = inFlightUntil.get(uuid);
-                if (blockUntil != null && now < blockUntil) {
-                    return;
-                }
-                inFlightUntil.put(uuid, now + IN_FLIGHT_GUARD_MS);
-                String reason = executor.formatReason(player, result.reasonKey, type, confidenceLevel);
-                history.record(uuid, player.getName(), result.dbType, reason, result.duration);
-                executor.execute(player, result, type, confidenceLevel);
-                tracker.reset();
+            long now = System.currentTimeMillis();
+            Long blockUntil = inFlightUntil.get(uuid);
+            if (blockUntil != null && now < blockUntil) {
+                return;
             }
+
+            AtomicLong tok = pendingDecisionToken.computeIfAbsent(uuid, k -> new AtomicLong());
+            long myToken = tok.incrementAndGet();
+
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (tok.get() != myToken) return;
+                Object lk = playerLocks.get(uuid);
+                if (lk == null) return;
+                synchronized (lk) {
+                    long now2 = System.currentTimeMillis();
+                    Long block2 = inFlightUntil.get(uuid);
+                    if (block2 != null && now2 < block2) return;
+
+                    int totalViolations = tracker.getTotalViolations();
+                    int typeViolations = tracker.getTypeViolations(type);
+
+                    PunishmentLadder.LadderResult result = ladder.decide(totalViolations, typeViolations, confidenceLevel);
+                    if (result.decision == PunishmentDecision.NONE) return;
+
+                    if (result.decision == PunishmentDecision.BAN
+                            && !tracker.wasPunishedRecently(type.getFamily(), 24L * 3600_000L)) {
+                        result = new PunishmentLadder.LadderResult(
+                                PunishmentDecision.TEMPBAN,
+                                DatabaseManager.PunishmentType.TEMPBAN,
+                                24L * 3600_000L,
+                                result.reasonKey);
+                        plugin.getLogger().info("BAN downgraded to TEMPBAN 24h for " + player.getName()
+                                + " (no prior tempban for " + type.getFamily() + ")");
+                    }
+
+                    inFlightUntil.put(uuid, now2 + IN_FLIGHT_GUARD_MS);
+                    tracker.recordPunishment(type.getFamily());
+                    String reason = executor.formatReason(player, result.reasonKey, type, confidenceLevel);
+                    history.record(uuid, player.getName(), result.dbType, reason, result.duration);
+                    executor.execute(player, result, type, confidenceLevel);
+                    tracker.reset();
+                }
+            }, 2L);
         }
     }
 
@@ -92,6 +125,7 @@ public class PunishmentManager {
         executor.cleanup(uuid);
         playerLocks.remove(uuid);
         inFlightUntil.remove(uuid);
+        pendingDecisionToken.remove(uuid);
     }
 
     public Map<UUID, Long> getLastWarningTimeMap() {

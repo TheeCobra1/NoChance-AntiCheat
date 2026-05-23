@@ -4,7 +4,12 @@ import NC.noChance.core.ViolationType;
 import NC.noChance.database.DatabaseManager;
 import org.bukkit.plugin.Plugin;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -61,10 +66,76 @@ public class PunishmentHistory {
         private volatile long lastDecayTime = System.currentTimeMillis();
         private static final long DECAY_INTERVAL = 45000;
 
+        private final Deque<Long> rawFlagTimestamps = new ArrayDeque<>();
+        private final Deque<Long> mitigatedTimestamps = new ArrayDeque<>();
+        private final Deque<FamilyFlag> familyFlagTimestamps = new ArrayDeque<>();
+        private final Map<ViolationType.CheckFamily, Long> familyLastPunished = new EnumMap<>(ViolationType.CheckFamily.class);
+        private static final long WINDOW_RETAIN_MS = 120_000L;
+
         public void addViolation(ViolationType type, double severity) {
             decay();
             violationCounts.merge(type, 1, Integer::sum);
             totalViolations.incrementAndGet();
+            long now = System.currentTimeMillis();
+            ViolationType.CheckFamily fam = type.getFamily();
+            synchronized (rawFlagTimestamps) {
+                rawFlagTimestamps.addLast(now);
+                pruneOld(rawFlagTimestamps, now);
+                familyFlagTimestamps.addLast(new FamilyFlag(now, fam));
+                while (!familyFlagTimestamps.isEmpty() && now - familyFlagTimestamps.peekFirst().time > WINDOW_RETAIN_MS) {
+                    familyFlagTimestamps.pollFirst();
+                }
+            }
+        }
+
+        public void markMitigated() {
+            long now = System.currentTimeMillis();
+            synchronized (rawFlagTimestamps) {
+                mitigatedTimestamps.addLast(now);
+                pruneOld(mitigatedTimestamps, now);
+            }
+        }
+
+        public int getFlagsWithin(long windowMs) {
+            long cutoff = System.currentTimeMillis() - windowMs;
+            synchronized (rawFlagTimestamps) {
+                int count = 0;
+                for (Long t : rawFlagTimestamps) if (t >= cutoff) count++;
+                return count;
+            }
+        }
+
+        public int getMitigatedWithin(long windowMs) {
+            long cutoff = System.currentTimeMillis() - windowMs;
+            synchronized (rawFlagTimestamps) {
+                int count = 0;
+                for (Long t : mitigatedTimestamps) if (t >= cutoff) count++;
+                return count;
+            }
+        }
+
+        public Set<ViolationType.CheckFamily> getDistinctFamiliesWithin(long windowMs) {
+            long cutoff = System.currentTimeMillis() - windowMs;
+            Set<ViolationType.CheckFamily> out = EnumSet.noneOf(ViolationType.CheckFamily.class);
+            synchronized (rawFlagTimestamps) {
+                for (FamilyFlag f : familyFlagTimestamps) if (f.time >= cutoff) out.add(f.family);
+            }
+            return out;
+        }
+
+        public void recordPunishment(ViolationType.CheckFamily family) {
+            if (family == null) return;
+            familyLastPunished.put(family, System.currentTimeMillis());
+        }
+
+        public boolean wasPunishedRecently(ViolationType.CheckFamily family, long windowMs) {
+            if (family == null) return false;
+            Long t = familyLastPunished.get(family);
+            return t != null && System.currentTimeMillis() - t < windowMs;
+        }
+
+        private static void pruneOld(Deque<Long> d, long now) {
+            while (!d.isEmpty() && now - d.peekFirst() > WINDOW_RETAIN_MS) d.pollFirst();
         }
 
         private void decay() {
@@ -100,6 +171,20 @@ public class PunishmentHistory {
             violationCounts.clear();
             totalViolations.set(0);
             lastDecayTime = System.currentTimeMillis();
+            synchronized (rawFlagTimestamps) {
+                rawFlagTimestamps.clear();
+                mitigatedTimestamps.clear();
+                familyFlagTimestamps.clear();
+            }
+        }
+
+        private static class FamilyFlag {
+            final long time;
+            final ViolationType.CheckFamily family;
+            FamilyFlag(long time, ViolationType.CheckFamily family) {
+                this.time = time;
+                this.family = family;
+            }
         }
     }
 }

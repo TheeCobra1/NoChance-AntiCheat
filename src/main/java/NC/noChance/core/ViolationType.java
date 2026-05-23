@@ -49,6 +49,10 @@ public enum ViolationType {
     SCAFFOLD_BRIDGE(4, 2.4, "Scaffold (Bridge)"),
     SCAFFOLD_TOWER(4, 2.6, "Scaffold (Tower)");
 
+    public enum CheckFamily {
+        MOVEMENT, COMBAT, BLOCK, INTERACT, PROTOCOL_FAMILY, OTHER
+    }
+
     private final int complexity;
     private final double weight;
     private final String displayName;
@@ -69,5 +73,31 @@ public enum ViolationType {
 
     public String getDisplayName() {
         return displayName;
+    }
+
+    public CheckFamily getFamily() {
+        switch (this) {
+            case FLY: case FLY_HOVER: case FLY_VERTICAL: case FLY_GLIDE:
+            case SPEED: case SPEED_GROUND: case SPEED_AIR: case SPEED_STRAFE:
+            case NOCLIP: case JESUS: case PHASE: case STEP: case BLINK:
+            case GROUNDSPOOF: case ELYTRAFLY: case STRIDER: case BOATFLY:
+            case STRAFE: case SPIDER: case TIMER: case NOFALL:
+                return CheckFamily.MOVEMENT;
+            case KILLAURA: case KILLAURA_MULTI: case KILLAURA_ANGLE:
+            case KILLAURA_ROTATION: case KILLAURA_PATTERN:
+            case REACH: case AUTOCLICKER: case AIMASSIST: case AIMASSIST_SILENT:
+            case CRITICALS: case VELOCITY:
+                return CheckFamily.COMBAT;
+            case FASTBREAK: case FASTPLACE: case NUKER:
+            case SCAFFOLD: case SCAFFOLD_BRIDGE: case SCAFFOLD_TOWER:
+                return CheckFamily.BLOCK;
+            case INVENTORY: case NOSLOW: case NOSLOW_ITEM: case NOSLOW_WEB:
+            case NOSLOW_HONEY: case GHOSTHAND: case INVALIDINTERACT:
+                return CheckFamily.INTERACT;
+            case PROTOCOL:
+                return CheckFamily.PROTOCOL_FAMILY;
+            default:
+                return CheckFamily.OTHER;
+        }
     }
 }
