@@ -111,9 +111,16 @@ public class PunishmentManager {
 
                     inFlightUntil.put(uuid, now2 + IN_FLIGHT_GUARD_MS);
                     tracker.recordPunishment(type.getFamily());
+                    int flags60s = tracker.getFlagsWithin(60_000L);
+                    int families60s = tracker.getDistinctFamiliesWithin(60_000L).size();
+                    int mitigated60s = tracker.getMitigatedWithin(60_000L);
+                    String verification = String.format("&a&l[✓ Confirmed]&r &7%dx flag%s / %d famil%s / %d mitigated",
+                            flags60s, flags60s == 1 ? "" : "s",
+                            families60s, families60s == 1 ? "y" : "ies",
+                            mitigated60s);
                     String reason = executor.formatReason(player, result.reasonKey, type, confidenceLevel);
                     history.record(uuid, player.getName(), result.dbType, reason, result.duration);
-                    executor.execute(player, result, type, confidenceLevel);
+                    executor.execute(player, result, type, confidenceLevel, verification);
                     tracker.reset();
                 }
             }, 2L);

@@ -132,6 +132,11 @@ public class PunishmentExecutor {
 
     public void execute(Player player, PunishmentLadder.LadderResult result, ViolationType type,
                         String confidenceLevel) {
+        execute(player, result, type, confidenceLevel, "");
+    }
+
+    public void execute(Player player, PunishmentLadder.LadderResult result, ViolationType type,
+                        String confidenceLevel, String verification) {
         String reasonText = msg(player, result.reasonKey);
         String reason = msg(player, "punishment.kick_format",
                 "reason", reasonText,
@@ -157,7 +162,7 @@ public class PunishmentExecutor {
                         }
                     }
 
-                    broadcastStaff("punishment.broadcast_warn", playerName, type.name());
+                    broadcastStaff("punishment.broadcast_warn", playerName, type.name(), verification);
                     notifyDiscord(playerName, type, "WARN", null, reasonText, confidenceLevel);
                     break;
 
@@ -165,7 +170,7 @@ public class PunishmentExecutor {
                     if (!dispatchExternal("kick", player, type, confidenceLevel, reasonText, null, 0L)) {
                         if (onlineNow) live.kickPlayer(reason);
                     }
-                    broadcastStaff("punishment.broadcast_kick", playerName, type.name());
+                    broadcastStaff("punishment.broadcast_kick", playerName, type.name(), verification);
                     notifyDiscord(playerName, type, "KICK", null, reasonText, confidenceLevel);
                     break;
 
@@ -182,7 +187,7 @@ public class PunishmentExecutor {
                         );
                         if (onlineNow) live.kickPlayer(reason + tempbanSuffix);
                     }
-                    broadcastStaffTempban(playerName, type.name(), duration);
+                    broadcastStaffTempban(playerName, type.name(), duration, verification);
                     notifyDiscord(playerName, type, "TEMPBAN", duration, reasonText, confidenceLevel);
                     break;
 
@@ -197,7 +202,7 @@ public class PunishmentExecutor {
                         String kickBan = reason + msg(player, "punishment.kick_ban_suffix");
                         if (onlineNow) live.kickPlayer(kickBan);
                     }
-                    broadcastStaff("punishment.broadcast_ban", playerName, type.name());
+                    broadcastStaff("punishment.broadcast_ban", playerName, type.name(), verification);
                     notifyDiscord(playerName, type, "BAN", "Permanent", reasonText, confidenceLevel);
                     break;
 
@@ -270,18 +275,28 @@ public class PunishmentExecutor {
     }
 
     private void broadcastStaff(String key, String playerName, String typeName) {
+        broadcastStaff(key, playerName, typeName, "");
+    }
+
+    private void broadcastStaff(String key, String playerName, String typeName, String checked) {
         for (Player staff : Bukkit.getOnlinePlayers()) {
             if (staff.hasPermission("nochance.alerts")) {
-                staff.sendMessage(msg(staff, key, "player", playerName, "type", typeName));
+                staff.sendMessage(msg(staff, key, "player", playerName, "type", typeName,
+                        "checked", checked == null ? "" : checked));
             }
         }
     }
 
     private void broadcastStaffTempban(String playerName, String typeName, String duration) {
+        broadcastStaffTempban(playerName, typeName, duration, "");
+    }
+
+    private void broadcastStaffTempban(String playerName, String typeName, String duration, String checked) {
         for (Player staff : Bukkit.getOnlinePlayers()) {
             if (staff.hasPermission("nochance.alerts")) {
                 staff.sendMessage(msg(staff, "punishment.broadcast_tempban",
-                        "player", playerName, "type", typeName, "duration", duration));
+                        "player", playerName, "type", typeName, "duration", duration,
+                        "checked", checked == null ? "" : checked));
             }
         }
     }

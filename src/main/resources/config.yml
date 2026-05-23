@@ -86,9 +86,11 @@ actions:
 
   # teleport flagged player back to last legit ground spot
   # only fires for movement cheats listed below
+  # teleport-back on movement violations. Fires BEFORE the punishment ladder
+  # decides, so legit players get a bump instead of a ban
   setback:
-    enabled: false
-    types: [FLY, FLY_HOVER, FLY_VERTICAL, FLY_GLIDE, SPEED, SPEED_GROUND, SPEED_AIR, SPEED_STRAFE, NOFALL, JESUS, GROUNDSPOOF, PHASE, NOCLIP, BLINK, STEP]
+    enabled: true
+    types: [FLY, FLY_HOVER, FLY_VERTICAL, FLY_GLIDE, SPEED, SPEED_GROUND, SPEED_AIR, SPEED_STRAFE, NOFALL, JESUS, GROUNDSPOOF, PHASE, NOCLIP, BLINK, STEP, SPIDER, STRAFE]
 
   # mitigation: cancel the offending event (hit/place/break) at medium confidence
   # instead of escalating to kick — false positives become bumps, not bans
