@@ -422,6 +422,17 @@ public class FlyCheck {
             return true;
         }
 
+        Location waterCheckLoc = player.getLocation();
+        if (waterCheckLoc.getWorld() != null) {
+            Material directlyBelow = BlockCache.getType(waterCheckLoc.getWorld(),
+                    waterCheckLoc.getBlockX(), waterCheckLoc.getBlockY() - 1, waterCheckLoc.getBlockZ());
+            if (directlyBelow == Material.WATER || BlockCache.nameContains(directlyBelow, "WATER")
+                    || directlyBelow == Material.LAVA) {
+                data.setLastWaterTime(System.currentTimeMillis());
+                return true;
+            }
+        }
+
         long timeSinceWater = System.currentTimeMillis() - data.getLastWaterTime();
         if (timeSinceWater < 1500) return true;
 
