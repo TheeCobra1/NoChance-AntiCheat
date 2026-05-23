@@ -1267,7 +1267,7 @@ public class PlayerListener implements Listener {
 
         Improbable imp = plugin.getImprobable();
         if (imp != null && type != null) {
-            String reason = checkResult.getReason();
+            String reason = checkResult.getDetails();
             if (reason == null || !reason.startsWith("IMPROBABLE")) {
                 imp.feed(player, type, Math.min(0.6, checkResult.getSeverity() * 0.4));
             }
